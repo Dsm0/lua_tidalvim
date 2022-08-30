@@ -1,0 +1,13 @@
+#!/bin/bash
+TIDALVIM_LUA_PATH=$HOME/.local/share/lua_tidalvim
+
+if [ -z "$1" ]
+  then
+    $TIDALVIM_LUA_PATH/nvim -u $TIDALVIM_LUA_PATH/init.lua $(date +'%m_%d_%y_%H_%M_%S').tidal
+  else
+    $TIDALVIM_LUA_PATH/nvim -u $TIDALVIM_LUA_PATH/init.lua $@
+fi
+
+
+
+

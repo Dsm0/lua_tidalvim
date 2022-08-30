@@ -1,0 +1,33 @@
+# TODO: make this more adaptable, 
+# ie: specify (x*8) and get a "<0 8 16 ....>" string that adapts
+snippet slice
+  slice (4*8) (fast 4 $ "[0] [1] [2] [3] [4] [5] [6] [7]" + "<0 8 16 24>") 
+
+snippet bite 
+  bite (1*8) ("[0] [1] [2] [3] [4] [5] [6] [7]") 
+
+snippet doh
+  do
+    hush
+    $1
+
+snippet while
+  while ("${1:[0]}") (${2:id})$
+
+snippet plyWith
+  plyWith (${1:1}) (${2:id}) $
+
+snippet runhats
+  d4 $ n (${3:0} + run ${2:8}) # "${1:808oh}"
+      & gain ("${5:12}"/8) # shape ($6/8) # rel (${7:2}/16)
+       & speed (${8:8}/8) # orbit (${9:0}) # hpf (${10:1}*100) # lpf (${11:15}*1000)
+       # sidechain ("${12:0}") # sidechain_thresh ("${13:1}"/1000) 
+       # sidechain_compression ("${14:1}"/1000) 
+       # sidechain_attack ("${15:1}"/1000) # sidechain_release ("${16:1}"/1000)
+
+snippet loopAtslice
+  d3 $ loopAt (${1:4}) $ slice (4*8) (fast 4 $ "[0 1 2 3 4 5 6 7]"+"<0 8 16 24>")
+        $ n "${2:0}" # "$3" |* gain (${4:16}/10) # orbit (${5:2})
+        # sidechain ("${12:0}") # sidechain_thresh ("${13:200}"/1000) 
+        # sidechain_compression ("${14:10}"/1000) 
+        # sidechain_attack ("${15:1}"/1000) # sidechain_release ("${16:1}"/1000)

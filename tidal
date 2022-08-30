@@ -1,0 +1,5 @@
+#!/bin/bash
+
+pushd ~/.local/share/lua_tidalvim/Tidal
+stack exec ghci -- -ghci-script ~/.config/tidal/init/BootTidal.hs
+popd
