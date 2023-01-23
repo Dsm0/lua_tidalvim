@@ -36,4 +36,3 @@ return {TidalSendBlock, TidalSendLine}
 -- buf_handle = api.nvim_win_get_buf(0) -- get the buffer handler 
 -- -- run your stuff here, could be anything 
 
-
