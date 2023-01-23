@@ -38,9 +38,8 @@ end
 
 
 function M.TidalSend(text)
-  if M.tidal_term_active == -1 then
-    print("tidal not open")
-    return
+  if M.tidal_term_active == -1 
+    then M.TidalOpen() 
   end
   vim.api.nvim_chan_send(tidal_channel,text .. "\r")
 end
@@ -74,9 +73,7 @@ end
 
 function M.TidalSendRegister(reg)
   local txt = vim.fn.getreg(reg)
-  if M.tidal_term_active == -1 
-    then M.TidalOpen() 
-  end
+
   -- TODO: should process text a bit more
   M.TidalSend('\n:{\r' .. txt .. ":}")
 end

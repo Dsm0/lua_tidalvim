@@ -15,9 +15,19 @@ function M.set_default_mappings()
     vim.api.nvim_set_keymap("n","<m-" .. i .. ">", '',
     {callback = function() tidalSolo.TidalSoloToggle(i) end})
   end
-  
+
+  vim.api.nvim_set_keymap("n","<m-0>", '',
+    {callback = tidalSolo.TidalUnsoloAll})
+
+  vim.api.nvim_set_keymap("n","<m-h>", '',
+    {callback = tidalSolo.TidalHush})
+
+  vim.api.nvim_set_keymap("n","<m-S-h>", '',
+    {callback = tidalSolo.TidalStreamHush})
+
   vim.api.nvim_set_keymap("",";",":",{noremap=true})
   vim.api.nvim_set_keymap("t","<Esc>","<C-\\><C-n>",{noremap=true})
+
 end
 
 -- default launch options (what I use)
