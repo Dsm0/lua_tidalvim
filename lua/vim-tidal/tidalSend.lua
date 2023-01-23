@@ -2,6 +2,9 @@ local ftplugin = require('vim-tidal.ftplugin')
 
 function TidalSendBlock()
 
+  vim.api.nvim_exec('normal!ml',{})
+  -- save the location of the last tidal evaluation to mark l
+
   local pos = vim.fn.getpos('.')
 
   vim.api.nvim_exec('normal!"tyip',{}) -- yanks block to register 't'
@@ -13,6 +16,9 @@ function TidalSendBlock()
 end
 
 function TidalSendLine()
+
+  vim.api.nvim_exec('normal!ml',{}) 
+  -- save the location of the last tidal evaluation to mark l
 
   local pos = vim.fn.getpos('.')
 
