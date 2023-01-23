@@ -18,18 +18,17 @@ function M.TidalOpen()
   vim.api.nvim_command('botright split term')
 
   tidal_channel = vim.fn.termopen('tidal')
-  -- TODO: make 
   vim.api.nvim_exec('normal!G',{})
 
+  -- TODO: make an autocmd to change M.tidal_term_active
+  -- when the tidal process gets closed
+  
   -- vim.api.nvim_create_autocmd(
   --     "TextChangedT",
   --       {pattern = "*:tidal",
   --       callback = vim.api.nvim_input('G')}
   --   )
-
-  -- vim.api.nvim_command('tabn ' .. og_tab )
-  -- vim.api.nvim_set_current_buf(txt_buf)
-
+  
   vim.api.nvim_set_current_win(og_win)
   vim.api.nvim_win_set_height(og_win,20)
 
@@ -63,7 +62,6 @@ end
 --   return table.concat(lines, '\n')
 -- end
 
-  
 -- -- BUGGY
 -- function M.TidalSendSelection()
 --   local txt = get_visual_selection()
@@ -74,9 +72,8 @@ end
 --   M.TidalSend('\n:{\r' .. txt .. "\r:}")
 -- end
 
-
 function M.TidalSendRegister(reg)
-  local txt = vim.fn.getreg(reg) -- get_visual_selection()
+  local txt = vim.fn.getreg(reg)
   if M.tidal_term_active == -1 
     then M.TidalOpen() 
   end
@@ -84,6 +81,10 @@ function M.TidalSendRegister(reg)
   M.TidalSend('\n:{\r' .. txt .. ":}")
 end
 
+local function TidalSendRegisterCmd(args)
+  local reg = args.fargs[1]
+  M.TidalSendRegister(reg)
+end
 
 -- it was more consistent to just yank the paragraph into a register
 -- than to have to use nvim_buf_get_lines
@@ -91,6 +92,6 @@ end
 
 vim.api.nvim_create_user_command('TidalOpen', M.TidalOpen, {nargs = 0, desc = 'start tidal process'})
 
-vim.api.nvim_create_user_command('TidalSendRegister', M.TidalSendRegister, {nargs = 1, desc = 'send text in the specified register to tidal'})
+vim.api.nvim_create_user_command('TidalSendRegister', TidalSendRegisterCmd, {nargs = 1, desc = 'send text in the specified register to tidal'})
 
 return M

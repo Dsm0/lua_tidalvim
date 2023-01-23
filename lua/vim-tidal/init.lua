@@ -1,9 +1,13 @@
-local ftplugin = require("vim-tidal.ftplugin")
-local send = require("vim-tidal.tidalSend")
-local syntax = require("vim-tidal.syntax")
-local defaults = require("vim-tidal.defaults")
+local M = {}
 
-defaults.set_default_mappings()
-defaults.set_default_settings()
+M.ftplugin = require("vim-tidal.ftplugin")
+M.tidalSend = require("vim-tidal.tidalSend")
+M.syntax = require("vim-tidal.syntax")
+M.tidalSolo = require("vim-tidal.tidalSolo")
+M.defaults = require("vim-tidal.defaults")
 
-return {ftplugin, send, syntax, defaults}
+
+M.defaults.set_default_mappings()
+M.defaults.set_default_settings()
+
+return M
