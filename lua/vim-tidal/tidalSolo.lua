@@ -7,6 +7,11 @@ M.orbits = {0,0,0,0,0,0,0,0,0}
 -- usually use a max of 9 orbits, 
 -- could easilly add more
 
+function M.TidalSoloedAsString()
+  return table.concat(M.orbits,',')
+end
+
+
 function M.TidalUnsoloAll()
   for i=1,#M.orbits do
     M.orbits[i] = 0

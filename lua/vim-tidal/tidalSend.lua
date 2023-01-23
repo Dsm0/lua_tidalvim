@@ -32,8 +32,8 @@ function M.TidalSendLine()
 
 end
 
-vim.api.nvim_create_user_command('TidalSendLine', M.TidalSendLine, {nargs = 0, desc = 'send individual line of text to tidal process'})
+vim.api.nvim_create_user_command('TidalSendLine', M.TidalSendLine, {nargs = 0, desc = 'send individual line of text to tidal process using register "t"'})
 
-vim.api.nvim_create_user_command('TidalSendBlock', M.TidalSendBlock, {nargs = 0, desc = 'send the block of text the cursor is on to tidal process'})
+vim.api.nvim_create_user_command('TidalSendBlock', M.TidalSendBlock, {nargs = 0, desc = 'send the block of text the cursor is on to tidal process using register "t"'})
 
 return M
