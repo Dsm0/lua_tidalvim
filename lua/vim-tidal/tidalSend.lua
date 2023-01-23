@@ -4,8 +4,8 @@ function TidalSendBlock()
 
   local pos = vim.fn.getpos('.')
 
-  vim.api.nvim_exec('normal!vip',{})
-  ftplugin.TidalSendSelection()
+  vim.api.nvim_exec('normal!"tyip',{}) -- yanks block to register 't'
+  ftplugin.TidalSendRegister('t')
   vim.api.nvim_input('<Esc>')
 
   vim.fn.setpos('.',pos)
@@ -16,8 +16,8 @@ function TidalSendLine()
 
   local pos = vim.fn.getpos('.')
 
-  vim.api.nvim_exec('normal!0v$',{})
-  ftplugin.TidalSendSelection()
+  vim.api.nvim_exec('normal!"tyy',{}) -- yanks line to register 't'
+  ftplugin.TidalSendRegister('t')
   vim.api.nvim_input('<Esc>')
 
   vim.fn.setpos('.',pos)
