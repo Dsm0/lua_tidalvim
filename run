@@ -1,2 +1,2 @@
 #!/bin/bash
-CONF_PATH=$PWD ./nvim_7_2 -u init.lua
+CONF_PATH=$PWD ./nvim -u init.lua
