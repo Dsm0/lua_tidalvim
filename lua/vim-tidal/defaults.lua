@@ -1,11 +1,16 @@
 -- default essential keybindings
 local tidalSend = require('vim-tidal.tidalSend')
 local tidalSolo = require('vim-tidal.tidalSolo')
+local fxMode = require('vim-tidal.fxMode')
 
 local M = {}
 
   -- default keybindings
 function M.set_default_mappings()
+
+  vim.api.nvim_set_keymap("",";",":",{noremap=true})
+  vim.api.nvim_set_keymap("t","<Esc>","<C-\\><C-n>",{noremap=true})
+
   vim.api.nvim_set_keymap("n","<c-l>", '',
       {callback = tidalSend.TidalSendBlock})
   vim.api.nvim_set_keymap("n","<c-k>", '',
@@ -25,8 +30,8 @@ function M.set_default_mappings()
   vim.api.nvim_set_keymap("n","<m-S-h>", '',
     {callback = tidalSolo.TidalStreamHush})
 
-  vim.api.nvim_set_keymap("",";",":",{noremap=true})
-  vim.api.nvim_set_keymap("t","<Esc>","<C-\\><C-n>",{noremap=true})
+  vim.api.nvim_set_keymap("n","<Tab>", '',
+      {callback = fxMode.FxMode})
 
 end
 

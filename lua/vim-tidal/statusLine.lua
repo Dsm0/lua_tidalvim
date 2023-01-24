@@ -1,4 +1,5 @@
 tidalSolo = require("vim-tidal.tidalSolo")
+fxBindings = require("vim-tidal.fxBindings")
 
 vim.api.nvim_set_hl(0, "ActiveLine", {ctermbg='lightgray', ctermfg='black'})
 vim.api.nvim_set_hl(0, "InactiveLine", {ctermbg='black', ctermfg='black'})
@@ -18,13 +19,13 @@ local function ActiveLine()
 
   local soloed = '%{v:lua.tidalSolo.TidalSoloedAsString()}'
 
-  -- local fxchain = '' -- TODO: implement fx chain
+  local fxchain = ': %{v:lua.fxBindings.GetFxStatus()}'
 
   local rowcol = ": %l,%c"
 
   local modified = "%m" -- if buffer has unsaved modifications, will show [+]
 
-  local status = table.concat({hl, mode, soloed, rowcol, modified},' ')
+  local status = table.concat({hl, mode, soloed, fxchain, rowcol, modified},' ')
 
   return status
 end
