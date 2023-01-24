@@ -1,2 +1,3 @@
 #!/bin/bash
-CONF_PATH=$PWD ./nvim -u init.lua /tmp/tst.tidal
+TIDALVIM_LUA_PATH=$HOME/.local/share/tidalvim_lua
+$TIDALVIM_LUA_PATH/nvim -u $TIDALVIM_LUA_PATH/init.lua $@
