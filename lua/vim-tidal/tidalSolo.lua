@@ -20,12 +20,20 @@ function M.TidalUnsoloAll()
 end
 
 
+-- NOTE: I have different bindings for sending
+-- `hush` and `streamHush tidal` because
+-- I have hush defined differently in my config
+
 function M.TidalHush()
   ftplugin.TidalSend('hush')
 end
 
 function M.TidalStreamHush()
   ftplugin.TidalSend('streamHush tidal')
+end
+
+function M.TidalResetCycles()
+  ftplugin.TidalSend('streamResetCycles tidal')
 end
 
 function M.TidalSoloToggle(orbit)

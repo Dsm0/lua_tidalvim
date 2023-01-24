@@ -4,8 +4,7 @@
 -- whatever that entails....
 
 -- this file might balloon in complexity and warrent its own seperate 
--- directory, but the keyboard interface this implements is what I'm 
--- used to
+-- directory, but the keyboard interface this implements is what I'm used to
 
 
 local tidalSolo = require('vim-tidal.tidalSolo')
@@ -51,13 +50,27 @@ function TidalResetEffects()
   SendFx()
 end
 
+function TidalClearEffects()
+  ftplugin.TidalSend('all $ id')
+end
 
+function TidalClearEffectsUnsolo()
+  tidalSolo.TidalUnsoloAll()
+  ftplugin.TidalSend('all $ id')
+end
 
-function mkBind(x)
+function mkEffectBind(x)
   willPush = function()
     TidalPushEffect(x)
   end
   return willPush
+end
+
+function mkSoloBind(x)
+  willSolo = function()
+    tidalSolo.TidalSoloToggle(x)
+  end
+  return willSolo
 end
 
 
@@ -72,70 +85,97 @@ end
 
 -- TODO: figure out how to case on fucking backspace
 -- as well as get numbers in there, etc...
+
 local tab = '\9'
 local esc = '\x1b'
 local ret = '\13' -- return
-local backspace = '\x08' 
--- local backspace = '\x7f'-- vim.fn.nr2char(126)
+-- local backspace = tostring('\80kb')
+local backspace = '\x80kb' -- vim.fn.nr2char(126)
+
+
+-- some keys return valid key codes but can't be converted to characters with nr2char
+-- ie: 
+-- c = vim.fn.getchar()
+-- c ~= vim.fn.char2nr(vim.fn.nr2char(c)) 
+-- for example, this is true for the bcakspace key
+
+-- if that's the case, they should be defined here
+-- NOTE: if it CAN reliably be converted to a readable character
+-- then it should not be defined in specialChars
+
+M.specialChars = {
+  ['\x80kb'] = "<BS>",
+}
 
 M.bindings = {
-  ['a'] = mkBind("a"),  
-  ['b'] = mkBind("b"),  
-  ['c'] = mkBind("c"),  
-  ['d'] = mkBind("d"),  
-  ['e'] = mkBind("e"),  
-  ['f'] = mkBind("f"),  
-  ['g'] = mkBind("g"),  
-  ['h'] = mkBind("h"),  
-  ['i'] = mkBind("i"),  
-  ['j'] = mkBind("j"),  
-  ['k'] = mkBind("k"),  
-  ['l'] = mkBind("l"),  
-  ['m'] = mkBind("m"),  
-  ['n'] = mkBind("n"),  
-  ['o'] = mkBind("o"),  
-  ['p'] = mkBind("p"),  
-  ['q'] = mkBind("q"),  
-  ['r'] = mkBind("r"),  
-  ['s'] = mkBind("s"),  
-  ['t'] = mkBind("t"),  
-  ['u'] = mkBind("u"),  
-  ['v'] = mkBind("v"),  
-  ['w'] = mkBind("w"),  
-  ['x'] = mkBind("x"),  
-  ['y'] = mkBind("y"),  
-  ['z'] = mkBind("z"),  
-  ['A'] = mkBind("A"),
-  ['B'] = mkBind("B"),
-  ['C'] = mkBind("C"),
-  ['D'] = mkBind("D"),
-  ['E'] = mkBind("E"),
-  ['F'] = mkBind("F"),
-  ['G'] = mkBind("G"),
-  ['H'] = mkBind("H"),
-  ['I'] = mkBind("I"),
-  ['J'] = mkBind("J"),
-  ['K'] = mkBind("K"),
-  ['L'] = mkBind("L"),
-  ['M'] = mkBind("M"),
-  ['N'] = mkBind("N"),
-  ['O'] = mkBind("O"),
-  ['P'] = mkBind("P"),
-  ['Q'] = mkBind("Q"),
-  ['R'] = mkBind("R"),
-  ['S'] = mkBind("S"),
-  ['T'] = mkBind("T"),
-  ['U'] = mkBind("U"),
-  ['V'] = mkBind("V"),
-  ['W'] = mkBind("W"),
-  ['X'] = mkBind("X"),  
-  ['Y'] = mkBind("Y"), 
-  ['Z'] = mkBind("Z"),  
-  ['0'] = tidalSolo.UnsoloAll,
-  ['\9'] = "quit",
+  ['a'] = mkEffectBind("a"),  
+  ['b'] = mkEffectBind("b"),  
+  ['c'] = mkEffectBind("c"),  
+  ['d'] = mkEffectBind("d"),  
+  ['e'] = mkEffectBind("e"),  
+  ['f'] = mkEffectBind("f"),  
+  ['g'] = mkEffectBind("g"),  
+  ['h'] = mkEffectBind("h"),  
+  ['i'] = mkEffectBind("i"),  
+  ['j'] = mkEffectBind("j"),  
+  ['k'] = mkEffectBind("k"),  
+  ['l'] = mkEffectBind("l"),  
+  ['m'] = mkEffectBind("m"),  
+  ['n'] = mkEffectBind("n"),  
+  ['o'] = mkEffectBind("o"),  
+  ['p'] = mkEffectBind("p"),  
+  ['q'] = mkEffectBind("q"),  
+  ['r'] = mkEffectBind("r"),  
+  ['s'] = mkEffectBind("s"),  
+  ['t'] = mkEffectBind("t"),  
+  ['u'] = mkEffectBind("u"),  
+  ['v'] = mkEffectBind("v"),  
+  ['w'] = mkEffectBind("w"),  
+  ['x'] = mkEffectBind("x"),  
+  ['y'] = mkEffectBind("y"),  
+  ['z'] = mkEffectBind("z"),  
+  ['A'] = mkEffectBind("A"),
+  ['B'] = mkEffectBind("B"),
+  ['C'] = mkEffectBind("C"),
+  ['D'] = mkEffectBind("D"),
+  ['E'] = mkEffectBind("E"),
+  ['F'] = mkEffectBind("F"),
+  ['G'] = mkEffectBind("G"),
+  ['H'] = mkEffectBind("H"),
+  ['I'] = mkEffectBind("I"),
+  ['J'] = mkEffectBind("J"),
+  ['K'] = mkEffectBind("K"),
+  ['L'] = mkEffectBind("L"),
+  ['M'] = mkEffectBind("M"),
+  ['N'] = mkEffectBind("N"),
+  ['O'] = mkEffectBind("O"),
+  ['P'] = mkEffectBind("P"),
+  ['Q'] = mkEffectBind("Q"),
+  ['R'] = mkEffectBind("R"),
+  ['S'] = mkEffectBind("S"),
+  ['T'] = mkEffectBind("T"),
+  ['U'] = mkEffectBind("U"),
+  ['V'] = mkEffectBind("V"),
+  ['W'] = mkEffectBind("W"),
+  ['X'] = mkEffectBind("X"),  
+  ['Y'] = mkEffectBind("Y"), 
+  ['Z'] = mkEffectBind("Z"),  
+  ["0"] = tidalSolo.TidalUnsoloAll,
+  ["1"] = mkSoloBind(1),
+  ["2"] = mkSoloBind(2),
+  ["3"] = mkSoloBind(3),
+  ["4"] = mkSoloBind(4),
+  ["5"] = mkSoloBind(5),
+  ["6"] = mkSoloBind(6),
+  ["7"] = mkSoloBind(7),
+  ["8"] = mkSoloBind(8),
+  ["9"] = mkSoloBind(9),
+  [")"] = TidalClearEffectsUnsolo,
+  [" "] = TidalClearEffects,
+  ['\t'] = "quit",
   [ret] = TidalResetEffects,
   ['`'] = TidalPopEffect,
-  [backspace] = TidalPopEffect,
+  ['<BS>'] = TidalPopEffect,
   [esc] = "quit"
 }
 

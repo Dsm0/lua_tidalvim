@@ -33,6 +33,9 @@ function M.set_default_mappings()
   vim.api.nvim_set_keymap("n","<Tab>", '',
       {callback = fxMode.FxMode})
 
+  vim.api.nvim_set_keymap("n","<m-R>", '',
+      {callback = tidalSolo.TidalResetCycles})
+
 end
 
 -- default launch options (what I use)
@@ -60,6 +63,5 @@ function M.set_default_settings()
     )
 
 end
-
 
 return M
