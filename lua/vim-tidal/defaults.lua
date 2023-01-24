@@ -66,7 +66,7 @@ end
 
 function M.load_default_plugins()
 
-  vim.api.nvim_exec('source ' .. vim.g.tidalvim_root .. '/autoload/plug.vim',{})
+  vim.api.nvim_exec('source ' .. vim.g.tidalvim_root .. '/plug.vim',{})
   
   local Plug = vim.fn['plug#']
   
