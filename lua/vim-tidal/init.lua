@@ -12,5 +12,6 @@ M.defaults = require("vim-tidal.defaults")
 
 M.defaults.set_default_mappings()
 M.defaults.set_default_settings()
+M.defaults.load_default_plugins()
 
 return M

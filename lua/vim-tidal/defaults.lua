@@ -64,4 +64,18 @@ function M.set_default_settings()
 
 end
 
+function M.load_default_plugins()
+
+  vim.api.nvim_exec('source ' .. vim.g.tidalvim_root .. '/autoload/plug.vim',{})
+  
+  local Plug = vim.fn['plug#']
+  
+  vim.call('plug#begin', vim.g.tidalvim_root.. '/plugins')
+  
+  Plug 'jiangmiao/auto-pairs'
+  
+  vim.call('plug#end')
+
+end
+
 return M
