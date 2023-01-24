@@ -8,4 +8,3 @@ vim.o.runtimepath = vim.o.runtimepath .. ", "
             .. vim.g.tidalvim_root .. ", " 
 
 local huh = require('vim-tidal')
-

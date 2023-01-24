@@ -36,6 +36,10 @@ function M.set_default_mappings()
   vim.api.nvim_set_keymap("n","<m-R>", '',
       {callback = tidalSolo.TidalResetCycles})
 
+  vim.api.nvim_set_keymap('n',"<c-d>", ':NERDTreeToggle<CR>',{})
+  vim.api.nvim_set_keymap('x',"<c-d>", ':NERDTreeToggle<CR>',{})
+  vim.api.nvim_set_keymap('',"<c-/>", ':Commentary<CR>',{})
+
 end
 
 -- default launch options (what I use)
@@ -49,6 +53,7 @@ function M.set_default_settings()
   vim.opt.tabstop = 2             -- 1 tab == 2 spaces
   vim.opt.smartindent = true      -- Autoindent new lines
   vim.opt.lazyredraw = true
+  vim.opt.commentstring = '-- %s'
 
   local new_tidal_file = function()
     vim.cmd('setfiletype tidal')
@@ -73,6 +78,11 @@ function M.load_default_plugins()
   vim.call('plug#begin', vim.g.tidalvim_root.. '/plugins')
   
   Plug 'jiangmiao/auto-pairs'
+
+  Plug 'tpope/vim-commentary'
+  Plug 'tpope/vim-surround'
+  Plug 'preservim/nerdtree'
+  Plug 'mbbill/undotree'
   
   vim.call('plug#end')
 
