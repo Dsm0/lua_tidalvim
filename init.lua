@@ -5,7 +5,7 @@
 
 -- vim.g.tidalvim_root = os.getenv("TIDALVIM_ROOT") .. 
 vim.g.tidalvim_root = 
-  os.getenv("HOME") .. '/.local/share/tidalvim_lua'
+  os.getenv("HOME") .. '/.local/share/lua_tidalvim'
 
 vim.o.runtimepath = vim.o.runtimepath .. ", " 
             .. vim.g.tidalvim_root .. ", "
