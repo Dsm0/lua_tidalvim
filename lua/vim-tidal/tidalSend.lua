@@ -11,10 +11,16 @@ function M.TidalSendBlock()
 
   vim.api.nvim_exec('normal!"tyip',{}) -- yanks block to register 't'
   ftplugin.TidalSendRegister('t')
-  vim.api.nvim_input('<Esc>')
+  -- vim.api.nvim_input('<Esc>')
 
   vim.fn.setpos('.',pos)
 
+end
+
+function M.TidalJumpSendBlock(x,opts)
+  opts = opts or ''
+  vim.fn.search(x,opts)
+  M.TidalSendBlock();
 end
 
 function M.TidalSendLine()
@@ -26,11 +32,12 @@ function M.TidalSendLine()
 
   vim.api.nvim_exec('normal!"tyy',{}) -- yanks line to register 't'
   ftplugin.TidalSendRegister('t')
-  vim.api.nvim_input('<Esc>')
+  -- vim.api.nvim_input('<Esc>')
 
   vim.fn.setpos('.',pos)
 
 end
+
 
 vim.api.nvim_create_user_command('TidalSendLine', M.TidalSendLine, {nargs = 0, desc = 'send individual line of text to tidal process using register "t"'})
 

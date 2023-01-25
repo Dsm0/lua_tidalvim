@@ -8,6 +8,15 @@ vim.g.tidalvim_root =
   os.getenv("HOME") .. '/.local/share/tidalvim_lua'
 
 vim.o.runtimepath = vim.o.runtimepath .. ", " 
-            .. vim.g.tidalvim_root .. ", " 
+            .. vim.g.tidalvim_root .. ", "
 
 local huh = require('vim-tidal')
+
+local luasnip = require('luasnip.loaders.from_snipmate')
+                  .load({paths = '/snippets'})
+
+-- require('../plugins/l')
+-- require("luasnip.loaders.from_snipmate")
+
+-- vim.api.nvim_set_keymap('x',"<c-d>", ':NERDTreeToggle<CR>',{})
+-- vim.api.nvim_exec("imap <silent><expr> <Tab> luasnip#expand_or_jumpable() ? 'luasnip-expand-or-jump' : '<Tab>' ",{})

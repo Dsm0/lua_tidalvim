@@ -36,6 +36,21 @@ function M.set_default_mappings()
   vim.api.nvim_set_keymap("n","<m-R>", '',
       {callback = tidalSolo.TidalResetCycles})
 
+  vim.api.nvim_set_keymap("","<M-d>", '',
+      {callback = (function() tidalSend.TidalJumpSendBlock('do$')end)})
+
+  vim.api.nvim_set_keymap("","<M-D>", '',
+      {callback = (function() tidalSend.TidalJumpSendBlock('do$','b') end)})
+
+
+  local searchstring="[\\$\\|\\#\\|&\\|\\|+]"
+  vim.api.nvim_set_keymap('n',"H","?" .. searchstring .. "<CR>",{silent=true})
+  vim.api.nvim_set_keymap('n',"L","/" .. searchstring .. "<CR>",{silent=true})
+  vim.cmd('set nohlsearch')
+
+  vim.api.nvim_set_keymap('n',"o","o ",{silent=true})
+  vim.api.nvim_set_keymap('n',"O","O ",{silent=true})
+
   vim.api.nvim_set_keymap('n',"<c-d>", ':NERDTreeToggle<CR>',{})
   vim.api.nvim_set_keymap('x',"<c-d>", ':NERDTreeToggle<CR>',{})
   vim.api.nvim_set_keymap('',"<c-/>", ':Commentary<CR>',{})
@@ -54,6 +69,8 @@ function M.set_default_settings()
   vim.opt.smartindent = true      -- Autoindent new lines
   vim.opt.lazyredraw = true
   vim.opt.commentstring = '-- %s'
+
+  vim.opt.relativenumber = true
 
   local new_tidal_file = function()
     vim.cmd('setfiletype tidal')
@@ -83,6 +100,8 @@ function M.load_default_plugins()
   Plug 'tpope/vim-surround'
   Plug 'preservim/nerdtree'
   Plug 'mbbill/undotree'
+  Plug 'L3MON4D3/LuaSnip'
+  Plug 'neovimhaskell/haskell-vim'
   
   vim.call('plug#end')
 

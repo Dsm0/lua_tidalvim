@@ -14,13 +14,16 @@ function M.FxMode()
 
   while bind ~= 'quit' do
 
+    vim.cmd('redrawstatus!')
+
     if type(bind) == 'function'
       then bind()
       -- else print('????? ', char, c, bind)
     end
 
     vim.cmd('redrawstatus!')
-    -- vim.cmd('silent! echom ""')
+    -- vim.cmd('redrawstatus!')
+    -- vim.cmd('silent! echom "AHHHHHHHHHHHHHH"')
 
     char = vim.fn.getchar()
 
@@ -33,12 +36,17 @@ function M.FxMode()
 
   end
 
-
   vim.cmd('redrawstatus!')
 
   vim.cmd("highlight Normal ctermbg=Black")
 
   return 
 end
+
+vim.api.nvim_create_user_command('TidalFxMode', M.FxMode, {nargs = 0, desc = 'enters FxMode, an event loop where you can bind the execution of lua functions to keys specified in fxBindings.lua'})
+
+
+
+
 
 return M

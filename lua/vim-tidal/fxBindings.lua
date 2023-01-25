@@ -8,6 +8,7 @@
 
 
 local tidalSolo = require('vim-tidal.tidalSolo')
+local tidalSend = require('vim-tidal.tidalSend')
 local ftplugin = require('vim-tidal.ftplugin')
 
 local effectsChain = ''
@@ -74,17 +75,21 @@ function mkSoloBind(x)
 end
 
 
--- function unichr(ord)
---     if ord == nil then return nil end
---     if ord < 32 then return string.format('\\x%02x', ord) end
---     if ord < 126 then return string.char(ord) end
---     if ord < 65539 then return string.format("\\u%04x", ord) end
---     if ord < 1114111 then return string.format("\\u%08x", ord) end
--- end
+-- TODO: refactor into 
+function mkFxModeBind(x)
+  willCall = function() 
+    x()
+    vim.call("TidalFxMode") 
+  end
+  return willCall
+end
 
 
--- TODO: figure out how to case on fucking backspace
--- as well as get numbers in there, etc...
+
+
+
+
+
 
 local tab = '\9'
 local esc = '\x1b'
@@ -172,11 +177,13 @@ M.bindings = {
   ["9"] = mkSoloBind(9),
   [")"] = TidalClearEffectsUnsolo,
   [" "] = TidalClearEffects,
+  ['+'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
+  ['_'] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
   ['\t'] = "quit",
   [ret] = TidalResetEffects,
   ['`'] = TidalPopEffect,
   ['<BS>'] = TidalPopEffect,
-  [esc] = "quit"
+  [esc] = "quit",
 }
 
 return M
