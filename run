@@ -1,5 +1,5 @@
 #!/bin/bash
-TIDALVIM_LUA_PATH=$HOME/.local/share/tidalvim_lua
+TIDALVIM_LUA_PATH=$HOME/.local/share/lua_tidalvim
 
 if [ -z "$1" ]
   then
