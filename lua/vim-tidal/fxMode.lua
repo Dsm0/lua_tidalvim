@@ -1,4 +1,4 @@
-local ftplugin = require("vim-tidal.ftplugin")
+local tidalSend = require("vim-tidal.tidalSend")
 local fxBindings = require('vim-tidal.fxBindings')
 local bindings = fxBindings.bindings
 local specialChars = fxBindings.specialChars

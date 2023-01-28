@@ -9,7 +9,7 @@
 
 local tidalSolo = require('vim-tidal.tidalSolo')
 local tidalSend = require('vim-tidal.tidalSend')
-local ftplugin = require('vim-tidal.ftplugin')
+local tidalSend = require('vim-tidal.tidalSend')
 
 local effectsChain = ''
 
@@ -26,7 +26,7 @@ local function SendFx()
     tosend = tosend .. '. eff_' .. c .. ' '
   end
 
-  ftplugin.TidalSend(tosend)
+  tidalSend.TidalSend(tosend)
 end
 
 function TidalPushEffect(effect)
@@ -52,12 +52,12 @@ function TidalResetEffects()
 end
 
 function TidalClearEffects()
-  ftplugin.TidalSend('all $ id')
+  tidalSend.TidalSend('all $ id')
 end
 
 function TidalClearEffectsUnsolo()
   tidalSolo.TidalUnsoloAll()
-  ftplugin.TidalSend('all $ id')
+  tidalSend.TidalSend('all $ id')
 end
 
 function mkEffectBind(x)

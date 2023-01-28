@@ -1,4 +1,4 @@
-local ftplugin = require("vim-tidal.ftplugin")
+local tidalSend = require("vim-tidal.tidalSend")
 
 local M = {}
 
@@ -18,7 +18,7 @@ function M.TidalUnsoloAll()
     M.orbits[i] = 0
   end
 
-  ftplugin.TidalSend('streamUnsoloAll tidal')
+  tidalSend.TidalSend('streamUnsoloAll tidal')
 
 end
 
@@ -28,15 +28,15 @@ end
 -- I have hush defined differently in my config
 
 function M.TidalHush()
-  ftplugin.TidalSend('hush')
+  tidalSend.TidalSend('hush')
 end
 
 function M.TidalStreamHush()
-  ftplugin.TidalSend('streamHush tidal')
+  tidalSend.TidalSend('streamHush tidal')
 end
 
 function M.TidalResetCycles()
-  ftplugin.TidalSend('streamResetCycles tidal')
+  tidalSend.TidalSend('streamResetCycles tidal')
 end
 
 function M.TidalSoloToggle(orbit)
@@ -45,10 +45,10 @@ function M.TidalSoloToggle(orbit)
       return else
       if M.orbits[orbit] == 0
         then 
-          ftplugin.TidalSend('solo ' .. orbit)
+          tidalSend.TidalSend('solo ' .. orbit)
           M.orbits[orbit] = 1
         else
-          ftplugin.TidalSend('unsolo ' .. orbit)
+          tidalSend.TidalSend('unsolo ' .. orbit)
           M.orbits[orbit] = 0
       end
   end
