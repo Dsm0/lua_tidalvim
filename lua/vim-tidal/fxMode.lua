@@ -18,12 +18,10 @@ function M.FxMode()
 
     if type(bind) == 'function'
       then bind()
-      -- else print('????? ', char, c, bind)
+			else print(string.byte(char,1,-1))
     end
 
     vim.cmd('redrawstatus!')
-    -- vim.cmd('redrawstatus!')
-    -- vim.cmd('silent! echom "AHHHHHHHHHHHHHH"')
 
     char = vim.fn.getchar()
 

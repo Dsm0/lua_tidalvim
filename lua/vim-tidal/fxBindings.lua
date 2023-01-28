@@ -109,7 +109,7 @@ local ret = '\13' -- return
 -- :lua print(string.byte(vim.fn.getchar(),1,-1))
 -- to find the bytes for any valid key combo
 M.specialChars = {
-  ['\120\107\98'] = "<BS>",
+  ['\x80kb'] = "<BS>",
   ['\128\252\2\13'] = "<S-Enter>",
   ['\128\252\8\13'] = "<M-Enter>",
   ['\128\252\8\48'] = "<M-0>",
