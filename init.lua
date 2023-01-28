@@ -10,7 +10,13 @@ vim.g.tidalvim_root =
 vim.o.runtimepath = vim.o.runtimepath .. ", " 
             .. vim.g.tidalvim_root .. ", "
 
-local huh = require('vim-tidal')
+local vimTidal = require('vim-tidal')
+
+
+vimTidal.defaults.set_default_mappings()
+vimTidal.defaults.set_default_settings()
+vimTidal.defaults.load_default_plugins()
+
 
 local luasnip = require('luasnip.loaders.from_snipmate')
                   .load({paths = '/snippets'})
