@@ -6,7 +6,6 @@
 -- this file might balloon in complexity and warrent its own seperate 
 -- directory, but the keyboard interface this implements is what I'm used to
 
-
 local tidalSolo = require('vim-tidal.tidalSolo')
 local tidalSend = require('vim-tidal.tidalSend')
 
@@ -94,7 +93,6 @@ local tab = '\9'
 local esc = '\x1b'
 local ret = '\13' -- return
 -- local backspace = tostring('\80kb')
-local backspace = '\x80kb' -- vim.fn.nr2char(126)
 
 
 -- some keys return valid key codes but can't be converted to characters with nr2char
@@ -107,11 +105,18 @@ local backspace = '\x80kb' -- vim.fn.nr2char(126)
 -- NOTE: if it CAN reliably be converted to a readable character
 -- then it should not be defined in specialChars
 
+-- use 
+-- :lua print(string.byte(vim.fn.getchar(),1,-1))
+-- to find the bytes for any valid key combo
 M.specialChars = {
-  ['\x80kb'] = "<BS>",
+  ['\120\107\98'] = "<BS>",
+  ['\128\252\2\13'] = "<S-Enter>",
+  ['\128\252\8\13'] = "<M-Enter>",
+  ['\128\252\8\48'] = "<M-0>",
+  ['\128\252\10\48'] = "<M-(>",
 }
 
-M.bindings = {
+M.bindings  = {
   ['a'] = mkEffectBind("a"),  
   ['b'] = mkEffectBind("b"),  
   ['c'] = mkEffectBind("c"),  
@@ -182,6 +187,7 @@ M.bindings = {
   [ret] = TidalResetEffects,
   ['`'] = TidalPopEffect,
   ['<BS>'] = TidalPopEffect,
+  ['<S-Enter>'] = TidalResetEffects,
   [esc] = "quit",
 }
 
