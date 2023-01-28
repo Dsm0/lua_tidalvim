@@ -13,10 +13,13 @@ end
 
 
 function M.TidalUnsoloAll()
+
   for i=1,#M.orbits do
     M.orbits[i] = 0
   end
-  ftplugin.TidalSend(('mapM_ unsolo [1..'.. #M.orbits ..']'))
+
+  ftplugin.TidalSend('streamUnsoloAll tidal')
+
 end
 
 
