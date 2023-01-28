@@ -9,7 +9,6 @@
 
 local tidalSolo = require('vim-tidal.tidalSolo')
 local tidalSend = require('vim-tidal.tidalSend')
-local tidalSend = require('vim-tidal.tidalSend')
 
 local effectsChain = ''
 

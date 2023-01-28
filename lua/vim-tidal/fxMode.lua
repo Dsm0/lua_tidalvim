@@ -46,7 +46,4 @@ end
 vim.api.nvim_create_user_command('TidalFxMode', M.FxMode, {nargs = 0, desc = 'enters FxMode, an event loop where you can bind the execution of lua functions to keys specified in fxBindings.lua'})
 
 
-
-
-
 return M

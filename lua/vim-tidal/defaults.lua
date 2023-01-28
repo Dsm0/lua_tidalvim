@@ -1,4 +1,3 @@
--- default essential keybindings
 local tidalSend = require('vim-tidal.tidalSend')
 local tidalSolo = require('vim-tidal.tidalSolo')
 local fxMode = require('vim-tidal.fxMode')
