@@ -6,11 +6,9 @@
 
 
 -- https://stackoverflow.com/a/69142336
-local function t(str)
+local function tc(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
-
-
 
 -- vim.g.tidalvim_root = os.getenv("TIDALVIM_ROOT") .. 
 vim.g.tidalvim_root = 
@@ -33,12 +31,33 @@ local ls = require('luasnip')
 require('luasnip.loaders.from_snipmate')
                   .load({path = 'snippets'})
 
-local expandSnippet = function()
-  if ls.expand_or_jumpable() then
-    ls.expand_or_jump()
-  end
+local ls = require("luasnip")
+local s = ls.snippet
+local f = ls.function_node
+local t = ls.text_node
+local i = ls.insert_node
+
+local function fn(args,parent,user_args)
+   local n = tonumber(args[1][1])
+   if n==nil -- didn't pass a number >:[
+     then return ""
+     else return vim.fn.system(table.concat({'echo -n \\[{0..', n-1, '}\\]'}))
+   end
 end
 
+-- inserts range
+ls.add_snippets("all",
+  {s("I", { f(fn, {1}, {}) , t ' [', i(1), t ']' }) }
+)
+
+local expandSnippet = function()
+  if ls.expand_or_jumpable() 
+    then
+      ls.expand_or_jump()
+    else
+      vim.cmd(tc("<Tab>"))
+  end
+end
 
 -- NOTE: this lets me create abbreviations for snippets
 -- if I have the snippet: orbit -> (# orbit ($1/8))
@@ -47,7 +66,7 @@ end
 -- ...
 -- This decision might come back to haunt me but there are not implementing
 -- snippet aliases and I'm not going to lol https://github.com/garbas/vim-snipmate/issues/124
-local doubleExpand = function()
+local doubleExpandSnippet = function()
   if ls.expand_or_jumpable() 
     then
       ls.expand_or_jump()
@@ -55,8 +74,8 @@ local doubleExpand = function()
         ls.expand()
       end
     else
-      vim.cmd(t("<Tab>"))
+      vim.cmd(tc("<Tab>"))
   end
 end
 
-vim.keymap.set({"i"}, "<Tab>", doubleExpand , { silent = true })
+vim.keymap.set({"i"}, "<Tab>", doubleExpandSnippet, { silent = true })
