@@ -50,21 +50,23 @@ ls.add_snippets("all",
   {s("I", { f(fn, {1}, {}) , t ' [', i(1), t ']' }) }
 )
 
-local expandSnippet = function()
-  if ls.expand_or_jumpable() 
-    then
-      ls.expand_or_jump()
-    else
-      vim.cmd(tc("<Tab>"))
+local expandSnippet = function(binding)
+  return function()
+    if ls.expand_or_jumpable() 
+      then
+        ls.expand_or_jump()
+      else
+        vim.cmd(tc(binding))
+    end
   end
 end
 
-local jumpBackwards = function()
-  if ls.jumpable(-1) 
-    then
-      ls.jump(-1)
-    else
-      vim.cmd(tc("<S-Tab>"))
+local jumpBackwards = function(binding)
+  return function() 
+    if ls.jumpable(-1) 
+      then ls.jump(-1)
+      else vim.cmd(tc(binding))
+    end
   end
 end
 
@@ -75,17 +77,19 @@ end
 -- ...
 -- This decision might come back to haunt me but there are not implementing
 -- snippet aliases and I'm not going to lol https://github.com/garbas/vim-snipmate/issues/124
-local doubleExpandSnippet = function()
-  if ls.expand_or_jumpable() 
-    then
-      ls.expand_or_jump()
-      if ls.expandable() then 
-        ls.expand()
-      end
-    else
-      vim.cmd(tc("<Tab>"))
+local doubleExpandSnippet = function(binding)
+  return function()
+    if ls.expand_or_jumpable() 
+      then
+        ls.expand_or_jump()
+        if ls.expandable() then 
+          ls.expand()
+        end
+      else
+        vim.cmd(tc(binding))
+    end
   end
 end
 
-vim.keymap.set({"i"}, "<Tab>", doubleExpandSnippet, { silent = true })
-vim.keymap.set({"i"}, "<S-Tab>", jumpBackwards, { silent = true })
+vim.keymap.set({"i"}, "<Tab>", doubleExpandSnippet("<Tab>"), { silent = true })
+vim.keymap.set({"i"}, "<S-Tab>", jumpBackwards("<S-Tab>"), { silent = true })
