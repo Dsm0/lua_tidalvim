@@ -31,7 +31,7 @@ vimTidal.defaults.load_default_plugins()
 
 local ls = require('luasnip')
 require('luasnip.loaders.from_snipmate')
-                  .load({paths = 'snippets'})
+                  .load({path = 'snippets'})
 
 local expandSnippet = function()
   if ls.expand_or_jumpable() then
