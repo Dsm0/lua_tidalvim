@@ -59,6 +59,15 @@ local expandSnippet = function()
   end
 end
 
+local jumpBackwards = function()
+  if ls.jumpable(-1) 
+    then
+      ls.jump(-1)
+    else
+      vim.cmd(tc("<S-Tab>"))
+  end
+end
+
 -- NOTE: this lets me create abbreviations for snippets
 -- if I have the snippet: orbit -> (# orbit ($1/8))
 -- I can abbreviate it with just o, then try to expand it twice
@@ -79,3 +88,4 @@ local doubleExpandSnippet = function()
 end
 
 vim.keymap.set({"i"}, "<Tab>", doubleExpandSnippet, { silent = true })
+vim.keymap.set({"i"}, "<S-Tab>", jumpBackwards, { silent = true })

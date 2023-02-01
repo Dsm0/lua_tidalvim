@@ -51,9 +51,9 @@ snippet delay
   # delay ($1/100)
 snippet delayt
   # delayt ($1/100)
-snippet delayfb
-  # delayfb ($1/100)
-snippet delayyy
+snippet delayfb 
+  # delayfb ($1/100) 
+snippet delay*
   # delay ($1/100) # delayt ($2/100) # delayfb ($3/100)
 
 snippet shape
@@ -85,3 +85,20 @@ snippet lsize
 
 snippet tremolo
   # tremolo ($1/10)
+
+# NOTE: this requires the sidechain effect to be loaded in supercollider
+# sidechain = pI "sidechain", the rest use pF, so
+# sidechain_thresh = pF "sidechain_thresh", etc...
+snippet sidechain
+  # sidechain ($1)
+snippet sidechain_thresh
+  # sidechain_thresh ($1/1000)
+snippet sidechain_compression
+  # sidechain_compression ($1/1000)
+snippet sidechain_attack
+  # sidechain_attack ($1/1000)
+snippet sidechain_release
+  # sidechain_release ($1/1000)
+
+snippet sidechain*
+  # sidechain ($1) # sidechain_thresh ($2/1000) # sidechain_compression ($3/1000) # sidechain_attack ($4/1000) # sidechain_release ($5/1000)
