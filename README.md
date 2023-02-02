@@ -3,6 +3,9 @@
 
 # TODO
 - fix yank to register issue
-- <enter>+<Shift> in fx mode should be treated as the same as just <enter>
-- snippets
 - full command support
+- add commonly used structures
+
+
+## Would be nice:
+- make snippets for all possible parameters 

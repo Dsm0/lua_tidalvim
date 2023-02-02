@@ -37,7 +37,7 @@ local f = ls.function_node
 local t = ls.text_node
 local i = ls.insert_node
 
-local function fn(args,parent,user_args)
+local function insertRange(args,parent,user_args)
    local n = tonumber(args[1][1])
    if n==nil -- didn't pass a number >:[
      then return ""
@@ -47,7 +47,7 @@ end
 
 -- inserts range
 ls.add_snippets("all",
-  {s("I", { f(fn, {1}, {}) , t ' [', i(1), t ']' }) }
+  {s("I", { f(insertRange, {1}, {}) , t ' [', i(1), t ']' }) }
 )
 
 local expandSnippet = function(binding)
