@@ -21,6 +21,8 @@ snippet rel
   # rel ($1/10)
 snippet sus
   # sus ($1/10)
+snippet env*
+  # att ($1/10) # hold ($2/10) # rel ($3/10) # sus ($4/10)
 
 
 snippet hpf
@@ -29,6 +31,8 @@ snippet hresonance
   # hresonance ($1*100)
 snippet hpq
   # hpq ($1/100)
+snippet hpf*
+  # hpf ($1*100) # hresonance ($2*100) # hpq ($3/100)
 
 snippet lpf
   # lpf ($1*100)
@@ -36,16 +40,22 @@ snippet lresonance
   # lresonance ($1*100)
 snippet lpq
   # lpq ($1/100)
+snippet lpf*
+  # lpf ($1*100) # lresonance ($2*100) # lpq ($3/100)
 
 snippet bpf
   # bpf ($1*100)
 snippet bpq
   # bpq ($1/100)
+snippet bpf*
+  # bpf ($1*100) # bpq ($2/100)
 
 snippet room
   # room ($1/100)
 snippet size
   # size ($1/100)
+snippet room*
+  # room ($1/100) # size ($2/100)
 
 snippet delay
   # delay ($1/100)
@@ -82,6 +92,8 @@ snippet lrate
   # lrate ($1/10)
 snippet lsize
   # lsize ($1/10)
+snippet leslie*
+  # leslie ($1/10) # lrate ($2/10) # lsize ($3/10)
 
 snippet tremolo
   # tremolo ($1/10)
@@ -99,6 +111,5 @@ snippet sidechain_attack
   # sidechain_attack ($1/1000)
 snippet sidechain_release
   # sidechain_release ($1/1000)
-
 snippet sidechain*
   # sidechain ($1) # sidechain_thresh ($2/1000) # sidechain_compression ($3/1000) # sidechain_attack ($4/1000) # sidechain_release ($5/1000)
