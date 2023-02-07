@@ -11,15 +11,60 @@ local tidalSend = require('vim-tidal.tidalSend')
 
 local effectsChain = ''
 
-local front = false
+local fxIndex = 0
 
 local M = {}
 
+
+local function insertAt(s,c,i)
+	if ((i < 0) or (i > #s)) then
+		print("invalid index passed to 'insertAt': ", i)
+		return s
+	end
+
+	local headStr = string.sub(s,1,i)
+	local tailStr = string.sub(s,i+1,-1)
+
+	return headStr .. c .. tailStr
+end
+
+local function removeAt(s,i)
+	if ((i < 0) or (i > #s)) then
+		print("invalid index passed to 'removeAt': ", i)
+		return s
+	end
+
+	local headStr = string.sub(s,1,i-1)
+	local tailStr = string.sub(s,i+1,-1)
+
+	return headStr .. tailStr
+end
+
 function M.GetFxStatus()
-  if front
-	  then return "<" .. effectsChain .. " "
-	  else return " " .. effectsChain .. ">"
-  end
+	if #effectsChain == 0
+		then return "+"
+		else return insertAt(effectsChain,"+",fxIndex)
+	end
+end
+
+local function TidalFxIndexStart()
+	fxIndex = 0
+	print(fxIndex)
+end
+
+local function TidalFxIndexEnd()
+	fxIndex = #effectsChain
+	print(fxIndex)
+end
+
+local function TidalFxIndexRight()
+	fxIndex = math.min(fxIndex + 1,#effectsChain)
+	print(fxIndex)
+end
+
+local function TidalFxIndexLeft()
+	fxIndex = math.max(fxIndex - 1,0)
+	print(fxIndex)
 end
 
 local function SendFx()
@@ -33,29 +78,45 @@ local function SendFx()
 end
 
 function TidalPushEffect(effect)
-  if front
-	then effectsChain = effect .. effectsChain
-	else effectsChain = effectsChain .. effect
-  end
+  effectsChain = insertAt(effectsChain,effect,fxIndex)
+  fxIndex = fxIndex + 1
+
   SendFx()
 end
 
-function TidalPopEffect()
+
+
+function TidalRemoveEffect()
   if #effectsChain == 0 
     then 
 		print('no effects to pop')
 		return
   end
-  effectsChain = effectsChain:sub(1,-2)
-
-  -- if front
-		-- then effectsChain = effectsChain:sub(2)
-		-- else effectsChain = 
-		-- effectsChain:sub(1,-2)
-  -- end
-
+  if fxIndex == 0 
+    then 
+		print("can't remove nothing")
+		return
+  end
+  effectsChain = removeAt(effectsChain,fxIndex)
+  fxIndex = fxIndex - 1
   SendFx()
+end
 
+function TidalRemoveEffectRight()
+  if #effectsChain == 0 
+    then 
+		print('no effects to pop')
+		return
+  end
+  if fxIndex >= #effectsChain
+    then 
+		print("can't remove nothing")
+		return
+  end
+
+  effectsChain = removeAt(effectsChain,fxIndex+1)
+  
+  SendFx()
 end
 
 function TidalDequeueEffect()
@@ -70,17 +131,13 @@ function TidalDequeueEffect()
 
 end
 
-function TidalToggleFront()
-	front = not(front)
-end
-
 function TidalRestoreEffects()
   SendFx()
 end
 
 function TidalResetEffects()
   effectsChain = ""
-  front = false
+  fxIndex = 0
   SendFx()
 end
 
@@ -95,7 +152,7 @@ end
 
 function TidalResetEffectsUnsolo()
   effectsChain = ""
-  front = false
+  fxIndex = 0
   tidalSolo.TidalUnsoloAll()
   tidalSend.TidalSend('all $ id')
 end
@@ -127,14 +184,9 @@ end
 
 
 
-
-
-
-
 local tab = '\9'
 local esc = '\x1b'
 local ret = '\13' -- return
--- local backspace = tostring('\80kb')
 
 
 -- some keys return valid key codes but can't be converted to characters with nr2char
@@ -157,6 +209,16 @@ M.specialChars = {
   ['\128\252\8\13'] = "<M-Enter>",
   ['\128\252\8\48'] = "<M-0>",
   ['\128\252\10\48'] = "<M-(>",
+  ['\128\107\108'] = "<LeftArrow>",
+  ['\128\107\114'] = "<RightArrow>",
+  ['\128\107\117'] = "<UpArrow>",
+  ['\128\107\100'] = "<DownArrow>",
+  ['\128\252\8\104'] = "<M-h>",
+  ['\128\252\8\72'] = "<M-H>",
+  ['\128\252\8\108'] = "<M-l>",
+  ['\128\252\8\76'] = "<M-L>",
+  ['\128\252\8\128\107\98'] = "<M-BS>",
+  ['\128\252\8\128\107\68'] = "<M-Del>",
 }
 
 M.bindings  = {
@@ -223,15 +285,23 @@ M.bindings  = {
   ["9"] = mkSoloBind(9),
   ["0"] = tidalSolo.TidalUnsoloAll,
   [")"] = TidalClearEffectsUnsolo,
-  [" "] = TidalToggleFront,
+  -- [" "] = TidalToggleFront,
   ['+'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
   ['_'] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
   ['\t'] = "quit",
   [ret] = TidalResetEffects,
-  ['`'] = TidalPopEffect,
-  ['<BS>'] = TidalPopEffect,
-  ['<Del>'] = TidalDequeueEffect,
+  ['`'] = TidalRemoveEffect,
+  ['<BS>'] = TidalRemoveEffect,
+  ['<M-BS>'] = TidalRemoveEffect,
+  ['<M-Del>'] = TidalRemoveEffectRight,
+  ['<Del>'] = TidalRemoveEffectRight,
   ['<S-Enter>'] = TidalResetEffectsUnsolo,
+  ['<LeftArrow>'] = TidalFxIndexLeft,
+  ['<M-h>'] = TidalFxIndexLeft,
+  ['<M-H>'] = TidalFxIndexStart,
+  ['<RightArrow>'] = TidalFxIndexRight,
+  ['<M-l>'] = TidalFxIndexRight,
+  ['<M-L>'] = TidalFxIndexEnd,
   [esc] = "quit"
 }
 

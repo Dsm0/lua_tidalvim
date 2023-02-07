@@ -18,7 +18,7 @@ function M.FxMode()
 
     if type(bind) == 'function'
       then bind()
-			else print(string.byte(char,1,-1))
+			else print("unknown keycode: " .. string.byte(char,1,-1))
     end
 
     vim.cmd('redrawstatus!')
