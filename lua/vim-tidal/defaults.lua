@@ -1,6 +1,7 @@
 local tidalSend = require('vim-tidal.tidalSend')
 local tidalSolo = require('vim-tidal.tidalSolo')
 local fxMode = require('vim-tidal.fxMode')
+local fxBindings = require('vim-tidal.fxBindings')
 
 local M = {}
 
@@ -54,6 +55,13 @@ function M.set_default_mappings()
   vim.api.nvim_set_keymap('x',"<c-d>", ':NERDTreeToggle<CR>',{})
   vim.api.nvim_set_keymap('',"<c-/>", ':Commentary<CR>',{})
 
+
+  vim.api.nvim_set_keymap("","<M-e>", '',
+      {callback = (function() 
+		  fxBindings.FxStringToReg('e') 
+		  vim.cmd("put e")
+	  end)})
+
 end
 
 -- default launch options (what I use)
@@ -105,5 +113,8 @@ function M.load_default_plugins()
   vim.call('plug#end')
 
 end
+
+
+
 
 return M

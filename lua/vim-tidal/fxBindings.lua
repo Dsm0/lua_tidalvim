@@ -67,12 +67,23 @@ local function TidalFxIndexLeft()
 	print(fxIndex)
 end
 
-local function SendFx()
-  local tosend = 'all $ id '
+local function getFxString()
+  local tosend = 'id'
 
   for c in effectsChain:gmatch"." do
-    tosend = tosend .. '. eff_' .. c .. ' '
+    tosend = tosend .. '.eff_' .. c
   end
+
+  return tosend
+end
+
+function M.FxStringToReg(reg)
+  vim.fn.setreg(reg,getFxString())
+end
+
+
+local function SendFx()
+  local tosend = 'all $ ' .. getFxString()
 
   tidalSend.TidalSend(tosend)
 end
