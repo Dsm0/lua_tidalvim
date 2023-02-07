@@ -11,10 +11,15 @@ local tidalSend = require('vim-tidal.tidalSend')
 
 local effectsChain = ''
 
+local front = false
+
 local M = {}
 
 function M.GetFxStatus()
-  return effectsChain
+  if front
+	  then return "<" .. effectsChain .. " "
+	  else return " " .. effectsChain .. ">"
+  end
 end
 
 local function SendFx()
@@ -28,16 +33,45 @@ local function SendFx()
 end
 
 function TidalPushEffect(effect)
-  effectsChain = effectsChain .. effect
+  if front
+	then effectsChain = effect .. effectsChain
+	else effectsChain = effectsChain .. effect
+  end
   SendFx()
 end
 
 function TidalPopEffect()
   if #effectsChain == 0 
-    then print('no effects to pop')
-    else effectsChain = effectsChain:sub(1,-2)
+    then 
+		print('no effects to pop')
+		return
   end
+  effectsChain = effectsChain:sub(1,-2)
+
+  -- if front
+		-- then effectsChain = effectsChain:sub(2)
+		-- else effectsChain = 
+		-- effectsChain:sub(1,-2)
+  -- end
+
   SendFx()
+
+end
+
+function TidalDequeueEffect()
+  if #effectsChain == 0 
+    then 
+		print('no effects to dequeue')
+		return
+  end
+
+  effectsChain = effectsChain:sub(2)
+  SendFx()
+
+end
+
+function TidalToggleFront()
+	front = not(front)
 end
 
 function TidalRestoreEffects()
@@ -46,6 +80,7 @@ end
 
 function TidalResetEffects()
   effectsChain = ""
+  front = false
   SendFx()
 end
 
@@ -54,6 +89,13 @@ function TidalClearEffects()
 end
 
 function TidalClearEffectsUnsolo()
+  tidalSolo.TidalUnsoloAll()
+  tidalSend.TidalSend('all $ id')
+end
+
+function TidalResetEffectsUnsolo()
+  effectsChain = ""
+  front = false
   tidalSolo.TidalUnsoloAll()
   tidalSend.TidalSend('all $ id')
 end
@@ -110,6 +152,7 @@ local ret = '\13' -- return
 -- to find the bytes for any valid key combo
 M.specialChars = {
   ['\x80kb'] = "<BS>",
+  ['\128\107\68'] = "<Del>",
   ['\128\252\2\13'] = "<S-Enter>",
   ['\128\252\8\13'] = "<M-Enter>",
   ['\128\252\8\48'] = "<M-0>",
@@ -169,7 +212,6 @@ M.bindings  = {
   ['X'] = mkEffectBind("X"),  
   ['Y'] = mkEffectBind("Y"), 
   ['Z'] = mkEffectBind("Z"),  
-  ["0"] = tidalSolo.TidalUnsoloAll,
   ["1"] = mkSoloBind(1),
   ["2"] = mkSoloBind(2),
   ["3"] = mkSoloBind(3),
@@ -179,16 +221,18 @@ M.bindings  = {
   ["7"] = mkSoloBind(7),
   ["8"] = mkSoloBind(8),
   ["9"] = mkSoloBind(9),
+  ["0"] = tidalSolo.TidalUnsoloAll,
   [")"] = TidalClearEffectsUnsolo,
-  [" "] = TidalClearEffects,
+  [" "] = TidalToggleFront,
   ['+'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
   ['_'] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
   ['\t'] = "quit",
   [ret] = TidalResetEffects,
   ['`'] = TidalPopEffect,
   ['<BS>'] = TidalPopEffect,
-  ['<S-Enter>'] = TidalResetEffects,
-  [esc] = "quit",
+  ['<Del>'] = TidalDequeueEffect,
+  ['<S-Enter>'] = TidalResetEffectsUnsolo,
+  [esc] = "quit"
 }
 
 return M
