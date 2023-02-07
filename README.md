@@ -2,7 +2,6 @@
 
 
 # TODO
-- fix yank to register issue
 - full command support
 - add commonly used structures
 

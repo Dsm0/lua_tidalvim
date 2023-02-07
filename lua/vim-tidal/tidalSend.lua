@@ -51,6 +51,7 @@ end
 
 function M.TidalSendBlock()
 
+  local og_reg_text = vim.fn.getreg("")
   vim.api.nvim_exec('normal!ml',{})
   -- save the location of the last tidal evaluation to mark l
 
@@ -59,8 +60,10 @@ function M.TidalSendBlock()
   vim.api.nvim_exec('normal!"tyip',{}) -- yanks block to register 't'
   M.TidalSendRegister('t')
   -- vim.api.nvim_input('<Esc>')
+  --
 
   vim.fn.setpos('.',pos)
+  vim.fn.setreg('',og_reg_text)
 
 end
 
