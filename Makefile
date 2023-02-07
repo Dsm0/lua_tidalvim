@@ -6,5 +6,6 @@ prefix=${HOME}
 install:
 	ln -fs $(mkfile_path) $(prefix)/.local/share
 	ln -fs $(mkfile_path)/run $(prefix)/.local/bin/tidalvim_lua
+	ln -fs $(mkfile_path)/tidal $(prefix)/.local/bin/tidal
 	./nvim --headless +PlugInstall +qa
 

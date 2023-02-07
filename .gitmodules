@@ -1,0 +1,3 @@
+[submodule "Tidal"]
+	path = Tidal
+	url = git@github.com:tidalcycles/Tidal.git
