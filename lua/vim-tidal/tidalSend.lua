@@ -65,6 +65,8 @@ function M.TidalSendBlock()
   vim.fn.setpos('.',pos)
   vim.fn.setreg('',og_reg_text)
 
+  vim.api.nvim_exec('normal!zz',{}) -- centers window on cursor
+
 end
 
 function M.TidalJumpSendBlock(x,opts)
