@@ -8,59 +8,49 @@ local M = {}
   -- default keybindings
 function M.set_default_mappings()
 
-  vim.api.nvim_set_keymap("",";",":",{noremap=true})
-  vim.api.nvim_set_keymap("t","<Esc>","<C-\\><C-n>",{noremap=true})
+  vim.keymap.set("",";",":",{noremap=true})
+  vim.keymap.set("t","<Esc>","<C-\\><C-n>",{noremap=true})
 
-  vim.api.nvim_set_keymap("n","<c-l>", '',
-      {callback = tidalSend.TidalSendBlock})
-  vim.api.nvim_set_keymap("n","<c-k>", '',
-      {callback = tidalSend.TidalSendLine})
+  vim.keymap.set({"n","i","s"},"<c-l>", tidalSend.TidalSendBlock, {silent = true })
+  vim.keymap.set({"n","i","s"},"<c-k>", tidalSend.TidalSendLine, {silent = true })
 
   for i=1,#tidalSolo.orbits do
-    vim.api.nvim_set_keymap("n","<m-" .. i .. ">", '',
-    {callback = function() tidalSolo.TidalSoloToggle(i) end})
+    vim.keymap.set("n","<M-" .. i .. ">", function() tidalSolo.TidalSoloToggle(i) end, {silent = true})
   end
 
-  vim.api.nvim_set_keymap("n","<m-0>", '',
-    {callback = tidalSolo.TidalUnsoloAll})
+  vim.keymap.set({"n","i","s"},"<M-0>", tidalSolo.TidalUnsoloAll, {silent = true})
 
-  vim.api.nvim_set_keymap("n","<m-h>", '',
-    {callback = tidalSolo.TidalHush})
+  vim.keymap.set({"n","i","s"},"<M-h>", tidalSolo.TidalHush, {silent = true})
 
-  vim.api.nvim_set_keymap("n","<m-S-h>", '',
-    {callback = tidalSolo.TidalStreamHush})
+  vim.keymap.set({"n","i","s"},"<M-S-h>", tidalSolo.TidalStreamHush, {silent = true})
 
-  vim.api.nvim_set_keymap("n","<Tab>", '',
-      {callback = fxMode.FxMode})
+  vim.keymap.set({"n"},"<Tab>", fxMode.FxMode, {silent = true})
 
-  vim.api.nvim_set_keymap("n","<m-R>", '',
-      {callback = tidalSolo.TidalResetCycles})
+  vim.keymap.set({"n","i","s"},"<M-R>", tidalSolo.TidalResetCycles, {silent = true})
 
-  vim.api.nvim_set_keymap("","<M-d>", '',
-      {callback = (function() tidalSend.TidalJumpSendBlock('do$')end)})
-
-  vim.api.nvim_set_keymap("","<M-D>", '',
-      {callback = (function() tidalSend.TidalJumpSendBlock('do$','b') end)})
+  vim.keymap.set({"n","i","s"},"<M-d>", function() tidalSend.TidalJumpSendBlock('do$') end, {silent = true})
+  
+  vim.keymap.set({"n","i","s"},"<M-D>", function() tidalSend.TidalJumpSendBlock('do$','b') end, {silent = true})
 
 
   local searchstring="[\\$\\|\\#\\|&\\|\\|+]"
-  vim.api.nvim_set_keymap('',"H","?" .. searchstring .. "<CR>",{silent=true})
-  vim.api.nvim_set_keymap('',"L","/" .. searchstring .. "<CR>",{silent=true})
+
+  vim.keymap.set({"n"},"H", "?" .. searchstring .. "<CR>", {silent = true})
+  vim.keymap.set({"n"},"L", "/" .. searchstring .. "<CR>", {silent = true})
+
   vim.cmd('set nohlsearch')
 
-  vim.api.nvim_set_keymap('n',"o","o ",{silent=true})
-  vim.api.nvim_set_keymap('n',"O","O ",{silent=true})
+  vim.keymap.set({'n'},"o","o ",{silent=true})
+  vim.keymap.set({'n'},"O","O ",{silent=true})
 
-  vim.api.nvim_set_keymap('n',"<c-d>", ':NERDTreeToggle<CR>',{})
-  vim.api.nvim_set_keymap('x',"<c-d>", ':NERDTreeToggle<CR>',{})
-  vim.api.nvim_set_keymap('',"<c-/>", ':Commentary<CR>',{})
+  vim.keymap.set({'n',"x"},"<c-d>", ':NERDTreeToggle<CR>',{})
+  vim.keymap.set({''},"<c-/>", ':Commentary<CR>',{})
 
 
-  vim.api.nvim_set_keymap("","<M-e>", '',
-      {callback = (function() 
+  vim.keymap.set({"n","i","s"},"<M-e>", (function() 
 		  fxBindings.FxStringToReg('e') 
 		  vim.cmd("put e")
-	  end)})
+	  end),{silent = true})
 
 end
 

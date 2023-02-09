@@ -91,5 +91,5 @@ local doubleExpandSnippet = function(binding)
   end
 end
 
-vim.keymap.set({"i"}, "<Tab>", doubleExpandSnippet("<Tab>"), { silent = true })
-vim.keymap.set({"i"}, "<S-Tab>", jumpBackwards("<S-Tab>"), { silent = true })
+vim.keymap.set({"i","s"}, "<Tab>", doubleExpandSnippet("<Tab>"), { silent = true })
+vim.keymap.set({"i","s"}, "<S-Tab>", jumpBackwards("<S-Tab>"), { silent = true })
