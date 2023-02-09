@@ -35,8 +35,8 @@ function M.set_default_mappings()
 
   local searchstring="[\\$\\|\\#\\|&\\|\\|+]"
 
-  vim.keymap.set({"n"},"H", "?" .. searchstring .. "<CR>", {silent = true})
-  vim.keymap.set({"n"},"L", "/" .. searchstring .. "<CR>", {silent = true})
+  vim.keymap.set({""},"H", "?" .. searchstring .. "<CR>", {silent = true})
+  vim.keymap.set({""},"L", "/" .. searchstring .. "<CR>", {silent = true})
 
   vim.cmd('set nohlsearch')
 
