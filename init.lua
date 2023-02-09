@@ -7,7 +7,7 @@
 
 -- https://stackoverflow.com/a/69142336
 local function tc(str)
-    return vim.api.nvim_replace_termcodes(str, true, true, true)
+    return vim.api.nvim_replace_termcodes(str, true, false, true)
 end
 
 -- vim.g.tidalvim_root = os.getenv("TIDALVIM_ROOT") .. 
@@ -65,7 +65,7 @@ local jumpBackwards = function(binding)
   return function() 
     if ls.jumpable(-1) 
       then ls.jump(-1)
-      else vim.cmd(tc(binding))
+      else vim.api.nvim_feedkeys(tc(binding), "n", false)
     end
   end
 end
@@ -79,17 +79,17 @@ end
 -- snippet aliases and I'm not going to lol https://github.com/garbas/vim-snipmate/issues/124
 local doubleExpandSnippet = function(binding)
   return function()
-    if ls.expand_or_jumpable() 
+    if ls.expand_or_locally_jumpable() 
       then
         ls.expand_or_jump()
         if ls.expandable() then 
           ls.expand()
         end
       else
-        vim.cmd(tc(binding))
+		vim.api.nvim_feedkeys(tc(binding), "n", false)
     end
   end
 end
 
-vim.keymap.set({"i","s"}, "<Tab>", doubleExpandSnippet("<Tab>"), { silent = true })
-vim.keymap.set({"i","s"}, "<S-Tab>", jumpBackwards("<S-Tab>"), { silent = true })
+vim.keymap.set({"i","s"}, "<tab>", doubleExpandSnippet("<tab>"), {})
+vim.keymap.set({"i","s"}, "<S-Tab>", jumpBackwards(""), { silent = true })
