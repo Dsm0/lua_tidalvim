@@ -13,8 +13,8 @@ local effectsChain = ''
 
 local fxIndex = 0
 
+local INDEXCHAR = '+'
 local M = {}
-
 
 local function insertAt(s,c,i)
 	if ((i < 0) or (i > #s)) then
@@ -27,6 +27,7 @@ local function insertAt(s,c,i)
 
 	return headStr .. c .. tailStr
 end
+
 
 local function removeAt(s,i)
 	if ((i < 0) or (i > #s)) then
@@ -42,35 +43,31 @@ end
 
 function M.GetFxStatus()
 	if #effectsChain == 0
-		then return "+"
-		else return insertAt(effectsChain,"+",fxIndex)
+		then return INDEXCHAR
+		else return insertAt(effectsChain,INDEXCHAR,fxIndex)
 	end
 end
 
 local function TidalFxIndexStart()
 	fxIndex = 0
-	print(fxIndex)
 end
 
 local function TidalFxIndexEnd()
 	fxIndex = #effectsChain
-	print(fxIndex)
 end
 
 local function TidalFxIndexRight()
 	fxIndex = math.min(fxIndex + 1,#effectsChain)
-	print(fxIndex)
 end
 
 local function TidalFxIndexLeft()
 	fxIndex = math.max(fxIndex - 1,0)
-	print(fxIndex)
 end
 
 local function getFxString()
   local tosend = 'id'
 
-  for c in effectsChain:gmatch"." do
+  for c in effectsChain:gmatch"%g" do
     tosend = tosend .. '.eff_' .. c
   end
 
@@ -183,22 +180,9 @@ function mkSoloBind(x)
 end
 
 
--- TODO: refactor into 
-function mkFxModeBind(x)
-  willCall = function() 
-    x()
-    vim.call("TidalFxMode") 
-  end
-  return willCall
-end
-
-
-
-
 local tab = '\9'
 local esc = '\x1b'
 local ret = '\13' -- return
-
 
 -- some keys return valid key codes but can't be converted to characters with nr2char
 -- ie: 
@@ -296,9 +280,11 @@ M.bindings  = {
   ["9"] = mkSoloBind(9),
   ["0"] = tidalSolo.TidalUnsoloAll,
   [")"] = TidalClearEffectsUnsolo,
-  -- [" "] = TidalToggleFront,
+  -- [" "] = TidalToggleFront, -- TODO: find a good use of <space> in fxMode
   ['+'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
   ['_'] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
+  ['='] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
+  ['-'] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
   ['\t'] = "quit",
   [ret] = TidalResetEffects,
   ['`'] = TidalRemoveEffect,
@@ -307,12 +293,13 @@ M.bindings  = {
   ['<M-Del>'] = TidalRemoveEffectRight,
   ['<Del>'] = TidalRemoveEffectRight,
   ['<S-Enter>'] = TidalResetEffectsUnsolo,
-  ['<LeftArrow>'] = TidalFxIndexLeft,
   ['<M-h>'] = TidalFxIndexLeft,
   ['<M-H>'] = TidalFxIndexStart,
-  ['<RightArrow>'] = TidalFxIndexRight,
   ['<M-l>'] = TidalFxIndexRight,
   ['<M-L>'] = TidalFxIndexEnd,
+  ['<LeftArrow>'] = TidalFxIndexLeft,
+  ['<UpArrow>'] = mkEffectBind('»'),
+  ['<RightArrow>'] = TidalFxIndexRight,
   [esc] = "quit"
 }
 
