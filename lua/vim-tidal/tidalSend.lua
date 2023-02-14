@@ -98,4 +98,12 @@ vim.api.nvim_create_user_command('TidalOpen', M.TidalOpen, {nargs = 0, desc = 's
 
 vim.api.nvim_create_user_command('TidalSendRegister', TidalSendRegisterCmd, {nargs = 1, desc = 'send text in the specified register to tidal'})
 
+
+vim.api.nvim_create_autocmd(
+    {"BufUnload"},
+      {pattern = "*:tidal",
+	  callback = function() M.tidal_term_active = -1 end
+      }
+  )
+
 return M
