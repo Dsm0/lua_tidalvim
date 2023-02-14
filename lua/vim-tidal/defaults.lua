@@ -69,6 +69,15 @@ function M.set_default_settings()
 
   vim.opt.relativenumber = true
 
+  vim.g.AutoPairs = {
+	    ['('] = ')'
+	  , ['['] = ']'
+	  , ['{'] = '}'
+	  , ["'"] = "'"
+	  , ['"'] = '"'
+	  , ["<"] = ">" 
+  }
+
   local new_tidal_file = function()
     vim.cmd('setfiletype tidal')
     vim.cmd('setlocal syntax=haskell')
