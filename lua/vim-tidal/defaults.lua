@@ -47,7 +47,7 @@ function M.set_default_mappings()
   vim.keymap.set({''},"<c-/>", ':Commentary<CR>',{})
 
 
-  vim.keymap.set({"n","i","s"},"<M-e>", (function() 
+  vim.keymap.set({"n","i","s"},"<M-X>", (function() 
 		  fxBindings.FxStringToReg('e') 
 		  vim.cmd("put e")
 	  end),{silent = true})
