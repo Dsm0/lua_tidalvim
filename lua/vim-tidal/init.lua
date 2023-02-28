@@ -7,5 +7,6 @@ M.fxMode = require("vim-tidal.fxMode")
 
 M.statusLine = require("vim-tidal.statusLine")
 M.defaults = require("vim-tidal.defaults")
+M.specialChars = require("vim-tidal.specialChars")
 
 return M

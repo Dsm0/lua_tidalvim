@@ -23,9 +23,13 @@ to your `.bashrc` or `.zshrc` or whatever you use
 
 
 # TODO
-- full command support
-- add commonly used structures as snippets
+- simplify fxBindings
+	- could just make a dict with evrey possible binding
+- add support for config files specifying fxBindings
+
+- full ex-command support
 
 
 ## Would be nice:
+- add more commonly used structures as snippets
 - make snippets for all possible parameters 

@@ -1,9 +1,11 @@
 local tidalSend = require("vim-tidal.tidalSend")
 local fxBindings = require('vim-tidal.fxBindings')
 local bindings = fxBindings.bindings
-local specialChars = fxBindings.specialChars
+local specialChars = require('vim-tidal.specialChars').specialChars
 
 local M = {}
+
+
 
 function M.FxMode()
   vim.cmd("highlight Normal ctermbg=DarkGray")
@@ -42,6 +44,5 @@ function M.FxMode()
 end
 
 vim.api.nvim_create_user_command('TidalFxMode', M.FxMode, {nargs = 0, desc = 'enters FxMode, an event loop where you can bind the execution of lua functions to keys specified in fxBindings.lua'})
-
 
 return M
