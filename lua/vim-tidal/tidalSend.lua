@@ -75,6 +75,12 @@ function M.TidalJumpSendBlock(x,opts)
   M.TidalSendBlock();
 end
 
+function M.TidalMarkSendBlock(x,opts)
+  opts = opts or ''
+  vim.api.nvim_exec('normal!`' .. x,{}) 
+  M.TidalSendBlock();
+end
+
 function M.TidalSendLine()
 
   vim.api.nvim_exec('normal!ml',{}) 

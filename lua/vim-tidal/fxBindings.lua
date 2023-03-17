@@ -110,6 +110,50 @@ function TidalRemoveEffect()
   SendFx()
 end
 
+
+-- NOTE: should start at fxIndex and be generic
+-- check out https://stackoverflow.com/a/15609379
+-- inputString:gsub('.','\0%0%0'):gsub('(.)%z%1','%1'):gsub('%z.(%Z+)',replace)
+--
+
+-- given some effect stack abcdeffffffffffff+g
+-- (where + indicates the insertion index (fxIndex))
+-- want to remove all repeating characters before +
+--
+-- abcdeffffffffffff+g
+-- ->
+-- abcde+g
+--
+--
+--
+-- should try to use gsub('(char+)')
+-- debugging expression :lua print((abcdefggggggfgggg):gsub((g+),aaaaaaaaa))
+
+
+function TidalRemoveRepeatedEffects()
+  if #effectsChain == 0 
+    then 
+		print('no effects to pop')
+		return
+  end
+  if fxIndex == 0 
+    then 
+		print("can't remove nothing")
+		return
+  end
+
+  charAtIndex = effectsChain:sub(fxIndex,fxIndex)
+
+  repeatStart, repeatEnd = string.find(charAtIndex .. "*$",fxIndex)
+
+  effectsChain = removeAt(effectsChain,fxIndex)
+
+  fxIndex = fxIndex - 1
+  SendFx()
+end
+
+
+
 function TidalRemoveEffectRight()
   if #effectsChain == 0 
     then 
@@ -142,6 +186,18 @@ end
 function TidalRestoreEffects()
   SendFx()
 end
+
+
+
+
+
+
+
+function TidalMkMark(mark)
+	vim.api.nvim_exec('normal!m' .. mark,{}) 
+	print(string.format("mark %s set at %s", mark, vim.fn.line('.')))
+end
+
 
 function TidalResetEffects()
   effectsChain = ""
@@ -280,7 +336,31 @@ M.bindings  = {
   ['<LeftArrow>'] = TidalFxIndexLeft,
   ['<UpArrow>'] = mkEffectBind('»'),
   ['<RightArrow>'] = TidalFxIndexRight,
-  [esc] = "quit"
+
+  [')'] = (function() tidalSend.TidalMarkSendBlock('0') end),
+  ['!'] = (function() tidalSend.TidalMarkSendBlock('1') end),
+  ['@'] = (function() tidalSend.TidalMarkSendBlock('2') end),
+  ['#'] = (function() tidalSend.TidalMarkSendBlock('3') end),
+  ['$'] = (function() tidalSend.TidalMarkSendBlock('4') end),
+  ['%'] = (function() tidalSend.TidalMarkSendBlock('5') end),
+  ['^'] = (function() tidalSend.TidalMarkSendBlock('6') end),
+  ['&'] = (function() tidalSend.TidalMarkSendBlock('7') end),
+  ['*'] = (function() tidalSend.TidalMarkSendBlock('8') end),
+  ['('] = (function() tidalSend.TidalMarkSendBlock('9') end),
+
+  ['<M-0>'] = (function () TidalMkMark('0') end),
+  ['<M-1>'] = (function () TidalMkMark('1') end),
+  ['<M-2>'] = (function () TidalMkMark('2') end),
+  ['<M-3>'] = (function () TidalMkMark('3') end),
+  ['<M-4>'] = (function () TidalMkMark('4') end),
+  ['<M-5>'] = (function () TidalMkMark('5') end),
+  ['<M-6>'] = (function () TidalMkMark('6') end),
+  ['<M-7>'] = (function () TidalMkMark('7') end),
+  ['<M-8>'] = (function () TidalMkMark('8') end),
+  ['<M-9>'] = (function () TidalMkMark('9') end),
+
+  [esc] = "quit",
+
 }
 
 return M
