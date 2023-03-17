@@ -37,10 +37,6 @@ local function insertFxAt(s,c,index)
 	
 	local i, _ = getNthMatchRange(',',s,index)
 
-	-- if j == nil or j == #s
-	-- 	then return s .. c
-	-- end
-
 	local headStr = string.sub(s,1,i)
 	local tailStr = string.sub(s,i+1,-1)
 
@@ -59,7 +55,7 @@ local function removeAt(s,i)
 	return headStr .. tailStr
 end
 
-local function removeBetween(s,first,last)
+local function replaceBetween(s,ns,first,last)
 	if ((first < 0) or (last > #s)) then
 		print("invalid index passed to 'removeAt': ", i)
 		return s
@@ -68,8 +64,14 @@ local function removeBetween(s,first,last)
 	local headStr = string.sub(s,1,first-1)
 	local tailStr = string.sub(s,last+1,-1)
 
-	return headStr .. tailStr
+	return headStr .. ns .. tailStr
 end
+
+
+
+
+
+
 
 
 function M.GetFxStatus()
@@ -164,7 +166,7 @@ function TidalRemoveEffect()
   end
 
   first, last = getNthMatchRange('%a%d*,',effectsChain,fxIndex)
-  effectsChain = removeBetween(effectsChain, first, last)
+  effectsChain = replaceBetween(effectsChain, '', first, last)
 
   fxCount = fxCount - 1
   fxIndex = fxIndex - 1
@@ -247,6 +249,36 @@ function TidalDequeueEffect()
 
 end
 
+
+function TidalIncFx(i)
+	if fxCount == 0 then 
+		print("can't inc nothing")
+		return
+	end
+
+	if fxIndex == 0 then 
+		TidalFxIndexRight()
+	end
+
+	first, last = getNthMatchRange('(-?%d+),',effectsChain,fxIndex)
+	val = tonumber(effectsChain:match('(-?%d+),',first-1))
+
+	-- there's some bug here 
+	-- I got val to be nil once, and I couldn't reproduce it
+	-- putting this here in the hopes I catch it again
+	if val == nil then
+		print(string.format('val was nil (???). first: %s last: %s fxIndex: %s fxChain: %s', first, last, fxIndex, effectsChain))
+		return
+	end
+
+	-- print('incFx: ',first,last, ' val: ', val)
+	val = val + i
+	effectsChain = replaceBetween(effectsChain, val, first, last-1)
+	SendFx()
+
+end
+
+
 function TidalRestoreEffects()
   SendFx()
 end
@@ -298,6 +330,14 @@ function mkSoloBind(x)
     tidalSolo.TidalSoloToggle(x)
   end
   return willSolo
+end
+
+
+function incFx(i)
+  willInc = function()
+	  TidalIncFx(i)
+  end
+  return willInc
 end
 
 
@@ -382,10 +422,10 @@ M.bindings  = {
   ["0"] = tidalSolo.TidalUnsoloAll,
   [")"] = TidalClearEffectsUnsolo,
   -- [" "] = TidalToggleFront, -- TODO: find a good use of <space> in fxMode
-  ['+'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
+  ['-'] = incFx(-1), -- (function() tidalSend.TidalJumpSendBlock('do$') end) ,
+  ['='] = incFx(1), -- (function() tidalSend.TidalJumpSendBlock('do$','b') end),
   ['_'] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
-  ['='] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
-  ['-'] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
+  ['+'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
   ['\t'] = "quit",
   [ret] = TidalResetEffects,
   ['`'] = TidalRemoveEffect,
