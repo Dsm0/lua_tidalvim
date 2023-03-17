@@ -11,7 +11,7 @@ local tidalSend = require('vim-tidal.tidalSend')
 
 local effectsChain = ''
 
--- local fxIndex = 0
+local fxIndex = 0
 local fxCount  = 0
 
 local INDEXCHAR = '+'
@@ -29,19 +29,20 @@ local function insertAt(s,c,i)
 	return headStr .. c .. tailStr
 end
 
-local function insertFxAt(s,c,fxIndex)
+local function insertFxAt(s,c,index)
 	if ((fxIndex < 0) or (fxIndex > fxCount)) then
-		print("invalid fxIndex passed to 'insertFxAt': ", fxIndex)
+		print("invalid fxIndex passed to 'insertFxAt': ", index)
 		return s
 	end
 	
-	local i, j = getNthMatchRange('%a%d*,',s,fxIndex)
-	if j == nil or j == #s
-		then return s .. c
-	end
+	local i, _ = getNthMatchRange(',',s,index)
 
-	local headStr = string.sub(s,1,i-1)
-	local tailStr = string.sub(s,j+1,-1)
+	-- if j == nil or j == #s
+	-- 	then return s .. c
+	-- end
+
+	local headStr = string.sub(s,1,i)
+	local tailStr = string.sub(s,i+1,-1)
 
 	return headStr .. c .. tailStr
 end
@@ -72,12 +73,13 @@ end
 
 
 function M.GetFxStatus()
-	return effectsChain
 
-	-- if #effectsChain == 0
-	-- 	then return INDEXCHAR
-	-- 	else return insertAt(effectsChain,INDEXCHAR,fxIndex)
-	-- end
+	first, _ = getNthMatchRange('%a',effectsChain,fxIndex)
+	
+	if #effectsChain == 0
+		then return INDEXCHAR
+		else return insertAt(effectsChain,INDEXCHAR,first)
+	end
 
 end
 
@@ -86,11 +88,11 @@ local function TidalFxIndexStart()
 end
 
 local function TidalFxIndexEnd()
-	fxIndex = #effectsChain
+	fxIndex = fxCount
 end
 
 local function TidalFxIndexRight()
-	fxIndex = math.min(fxIndex + 1,#effectsChain)
+	fxIndex = math.min(fxIndex + 1,fxCount)
 end
 
 local function TidalFxIndexLeft()
@@ -115,9 +117,10 @@ end
 
 function TidalPushEffect(effect)
 
-  effectsChain = insertFxAt(effectsChain,effect,fxCount)
+  effectsChain = insertFxAt(effectsChain,effect,fxIndex)
 
   fxCount = fxCount + 1
+  fxIndex = fxIndex + 1
 
   SendFx()
 end
@@ -154,19 +157,17 @@ function TidalRemoveEffect()
 		print('no effects to pop')
 		return
   end
-  if fxCount == 0 
+  if fxIndex == 0
     then 
 		print("can't remove nothing")
 		return
   end
 
-
-
-  first, last = getNthMatchRange('%a%d*,',effectsChain,fxCount)
-  print(first,last)
+  first, last = getNthMatchRange('%a%d*,',effectsChain,fxIndex)
   effectsChain = removeBetween(effectsChain, first, last)
 
   fxCount = fxCount - 1
+  fxIndex = fxIndex - 1
   SendFx()
 
 end
@@ -394,10 +395,10 @@ M.bindings  = {
   -- ['<Del>'] = TidalRemoveEffectRight,
   ['<S-Enter>'] = TidalResetEffectsUnsolo,
 
-  -- ['<M-h>'] = TidalFxIndexLeft,
-  -- ['<M-H>'] = TidalFxIndexStart,
-  -- ['<M-l>'] = TidalFxIndexRight,
-  -- ['<M-L>'] = TidalFxIndexEnd,
+  ['<M-h>'] = TidalFxIndexLeft,
+  ['<M-H>'] = TidalFxIndexStart,
+  ['<M-l>'] = TidalFxIndexRight,
+  ['<M-L>'] = TidalFxIndexEnd,
 
   -- ['<LeftArrow>'] = TidalFxIndexLeft,
   -- ['<UpArrow>'] = mkEffectBind('»'),
