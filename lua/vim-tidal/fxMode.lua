@@ -11,7 +11,12 @@ function M.FxMode()
   vim.cmd("highlight Normal ctermbg=DarkGray")
 
   char = vim.fn.getchar()
-  c = vim.fn.nr2char(char)
+
+  if specialChars[char] ~= nil -- note: should only satisfy this case if vim.fn.nr2char(char) doesn't return a printable character
+    then c = specialChars[char] 
+    else c = vim.fn.nr2char(char)
+  end
+
   bind = bindings[c]
 
   while bind ~= 'quit' do
@@ -19,8 +24,7 @@ function M.FxMode()
     vim.cmd('redrawstatus!')
 
     if type(bind) == 'function'
-      then bind()
-			else print(string.byte(char,1,-1))
+      then bind() else print(string.byte(char,1,-1))
     end
 
     vim.cmd('redrawstatus!')
