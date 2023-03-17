@@ -13,6 +13,7 @@ local effectsChain = ''
 
 local fxIndex = 0
 local fxCount  = 0
+local lastPush = nil
 
 local INDEXCHAR = '+'
 local M = {}
@@ -118,11 +119,18 @@ local function SendFx()
 end
 
 function TidalPushEffect(effect)
+  
+  if effect == lastPush and fxCount > 0 then
+	  TidalIncFx(1)
+	  return
+  end
 
   effectsChain = insertFxAt(effectsChain,effect,fxIndex)
 
   fxCount = fxCount + 1
   fxIndex = fxIndex + 1
+
+  lastPush = effect
 
   SendFx()
 end
@@ -175,80 +183,10 @@ function TidalRemoveEffect()
 end
 
 
--- NOTE: should start at fxIndex and be generic
--- check out https://stackoverflow.com/a/15609379
--- inputString:gsub('.','\0%0%0'):gsub('(.)%z%1','%1'):gsub('%z.(%Z+)',replace)
---
-
--- given some effect stack abcdeffffffffffff+g
--- (where + indicates the insertion index (fxIndex))
--- want to remove all repeating characters before +
---
--- abcdeffffffffffff+g
--- ->
--- abcde+g
---
---
---
--- should try to use gsub('(char+)')
--- debugging expression :lua print((abcdefggggggfgggg):gsub((g+),aaaaaaaaa))
-
-
-function TidalRemoveRepeatedEffects()
-
-  if #effectsChain == 0 
-    then 
-		print('no effects to pop')
-		return
-  end
-
-  if fxIndex == 0 
-    then 
-		print("can't remove nothing")
-		return
-  end
-
-  charAtIndex = effectsChain:sub(fxIndex,fxIndex)
-
-  repeatStart, repeatEnd = string.find(charAtIndex .. "*$",fxIndex)
-
-  effectsChain = removeAt(effectsChain,fxIndex)
-
-  fxIndex = fxIndex - 1
-  SendFx()
-end
-
-
-
 function TidalRemoveEffectRight()
-  if #effectsChain == 0 
-    then 
-		print('no effects to pop')
-		return
-  end
-  if fxIndex >= #effectsChain
-    then 
-		print("can't remove nothing")
-		return
-  end
-
-  effectsChain = removeAt(effectsChain,fxIndex+1)
-  
-  SendFx()
+	TidalFxIndexRight()
+	TidalRemoveEffect()
 end
-
-function TidalDequeueEffect()
-  if #effectsChain == 0 
-    then 
-		print('no effects to dequeue')
-		return
-  end
-
-  effectsChain = effectsChain:sub(2)
-  SendFx()
-
-end
-
 
 function TidalIncFx(i)
 	if fxCount == 0 then 
@@ -299,6 +237,7 @@ function TidalResetEffects()
   effectsChain = ""
   fxIndex = 0
   fxCount = 0
+  lastPush = nil
   SendFx()
 end
 
@@ -314,6 +253,8 @@ end
 function TidalResetEffectsUnsolo()
   effectsChain = ""
   fxIndex = 0
+  fxCount = 0
+  lastPush = nil
   tidalSolo.TidalUnsoloAll()
   tidalSend.TidalSend('all $ id')
 end
@@ -421,18 +362,21 @@ M.bindings  = {
   ["9"] = mkSoloBind(9),
   ["0"] = tidalSolo.TidalUnsoloAll,
   [")"] = TidalClearEffectsUnsolo,
+  
   -- [" "] = TidalToggleFront, -- TODO: find a good use of <space> in fxMode
+  
   ['-'] = incFx(-1), -- (function() tidalSend.TidalJumpSendBlock('do$') end) ,
   ['='] = incFx(1), -- (function() tidalSend.TidalJumpSendBlock('do$','b') end),
   ['_'] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
   ['+'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
+  ['['] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
+  [']'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
   ['\t'] = "quit",
   [ret] = TidalResetEffects,
   ['`'] = TidalRemoveEffect,
   ['<BS>'] = TidalRemoveEffect,
   ['<M-BS>'] = TidalRemoveEffect,
-  -- ['<M-Del>'] = TidalRemoveEffectRight,
-  -- ['<Del>'] = TidalRemoveEffectRight,
+  ['<Del>'] = TidalRemoveEffectRight,
   ['<S-Enter>'] = TidalResetEffectsUnsolo,
 
   ['<M-h>'] = TidalFxIndexLeft,
