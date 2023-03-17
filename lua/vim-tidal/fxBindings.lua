@@ -11,7 +11,8 @@ local tidalSend = require('vim-tidal.tidalSend')
 
 local effectsChain = ''
 
-local fxIndex = 0
+-- local fxIndex = 0
+local fxCount  = 0
 
 local INDEXCHAR = '+'
 local M = {}
@@ -28,6 +29,22 @@ local function insertAt(s,c,i)
 	return headStr .. c .. tailStr
 end
 
+local function insertFxAt(s,c,fxIndex)
+	if ((fxIndex < 0) or (fxIndex > fxCount)) then
+		print("invalid fxIndex passed to 'insertFxAt': ", fxIndex)
+		return s
+	end
+	
+	local i, j = getNthMatchRange('%a%d*,',s,fxIndex)
+	if j == nil or j == #s
+		then return s .. c
+	end
+
+	local headStr = string.sub(s,1,i-1)
+	local tailStr = string.sub(s,j+1,-1)
+
+	return headStr .. c .. tailStr
+end
 
 local function removeAt(s,i)
 	if ((i < 0) or (i > #s)) then
@@ -41,11 +58,27 @@ local function removeAt(s,i)
 	return headStr .. tailStr
 end
 
-function M.GetFxStatus()
-	if #effectsChain == 0
-		then return INDEXCHAR
-		else return insertAt(effectsChain,INDEXCHAR,fxIndex)
+local function removeBetween(s,first,last)
+	if ((first < 0) or (last > #s)) then
+		print("invalid index passed to 'removeAt': ", i)
+		return s
 	end
+
+	local headStr = string.sub(s,1,first-1)
+	local tailStr = string.sub(s,last+1,-1)
+
+	return headStr .. tailStr
+end
+
+
+function M.GetFxStatus()
+	return effectsChain
+
+	-- if #effectsChain == 0
+	-- 	then return INDEXCHAR
+	-- 	else return insertAt(effectsChain,INDEXCHAR,fxIndex)
+	-- end
+
 end
 
 local function TidalFxIndexStart()
@@ -65,13 +98,7 @@ local function TidalFxIndexLeft()
 end
 
 local function getFxString()
-  local tosend = 'id'
-
-  for c in effectsChain:gmatch"%g" do
-    tosend = tosend .. '.eff_' .. c
-  end
-
-  return tosend
+  return 'effStr "' .. effectsChain .. '"'
 end
 
 function M.FxStringToReg(reg)
@@ -81,16 +108,43 @@ end
 
 local function SendFx()
   local tosend = 'all $ ' .. getFxString()
+--   local tosend = 'all $ effStr "' .. effectsChain .. '"'
 
   tidalSend.TidalSend(tosend)
 end
 
 function TidalPushEffect(effect)
-  effectsChain = insertAt(effectsChain,effect,fxIndex)
-  fxIndex = fxIndex + 1
+
+  effectsChain = insertFxAt(effectsChain,effect,fxCount)
+
+  fxCount = fxCount + 1
 
   SendFx()
 end
+
+
+function getNthMatch(pat, str, n)
+  local i = 1
+  for match in string.gmatch(str, pat) do
+	if i == n
+		then return match
+	end
+	i = i + 1
+  end
+  return "no match :_:"
+end
+
+function getNthMatchRange(pat, str, n)
+  local i = 1
+  for match in string.gmatch(str, '()' .. pat) do
+	if i == n
+		then return str:find(pat,match)
+	end
+	i = i + 1
+  end
+  return 0
+end
+
 
 
 
@@ -100,14 +154,21 @@ function TidalRemoveEffect()
 		print('no effects to pop')
 		return
   end
-  if fxIndex == 0 
+  if fxCount == 0 
     then 
 		print("can't remove nothing")
 		return
   end
-  effectsChain = removeAt(effectsChain,fxIndex)
-  fxIndex = fxIndex - 1
+
+
+
+  first, last = getNthMatchRange('%a%d*,',effectsChain,fxCount)
+  print(first,last)
+  effectsChain = removeBetween(effectsChain, first, last)
+
+  fxCount = fxCount - 1
   SendFx()
+
 end
 
 
@@ -131,11 +192,13 @@ end
 
 
 function TidalRemoveRepeatedEffects()
+
   if #effectsChain == 0 
     then 
 		print('no effects to pop')
 		return
   end
+
   if fxIndex == 0 
     then 
 		print("can't remove nothing")
@@ -202,6 +265,7 @@ end
 function TidalResetEffects()
   effectsChain = ""
   fxIndex = 0
+  fxCount = 0
   SendFx()
 end
 
@@ -223,7 +287,7 @@ end
 
 function mkEffectBind(x)
   willPush = function()
-    TidalPushEffect(x)
+    TidalPushEffect(x .. '1,')
   end
   return willPush
 end
@@ -326,16 +390,18 @@ M.bindings  = {
   ['`'] = TidalRemoveEffect,
   ['<BS>'] = TidalRemoveEffect,
   ['<M-BS>'] = TidalRemoveEffect,
-  ['<M-Del>'] = TidalRemoveEffectRight,
-  ['<Del>'] = TidalRemoveEffectRight,
+  -- ['<M-Del>'] = TidalRemoveEffectRight,
+  -- ['<Del>'] = TidalRemoveEffectRight,
   ['<S-Enter>'] = TidalResetEffectsUnsolo,
-  ['<M-h>'] = TidalFxIndexLeft,
-  ['<M-H>'] = TidalFxIndexStart,
-  ['<M-l>'] = TidalFxIndexRight,
-  ['<M-L>'] = TidalFxIndexEnd,
-  ['<LeftArrow>'] = TidalFxIndexLeft,
-  ['<UpArrow>'] = mkEffectBind('»'),
-  ['<RightArrow>'] = TidalFxIndexRight,
+
+  -- ['<M-h>'] = TidalFxIndexLeft,
+  -- ['<M-H>'] = TidalFxIndexStart,
+  -- ['<M-l>'] = TidalFxIndexRight,
+  -- ['<M-L>'] = TidalFxIndexEnd,
+
+  -- ['<LeftArrow>'] = TidalFxIndexLeft,
+  -- ['<UpArrow>'] = mkEffectBind('»'),
+  -- ['<RightArrow>'] = TidalFxIndexRight,
 
   [')'] = (function() tidalSend.TidalMarkSendBlock('0') end),
   ['!'] = (function() tidalSend.TidalMarkSendBlock('1') end),
