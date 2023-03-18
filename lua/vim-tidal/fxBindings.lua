@@ -120,7 +120,9 @@ end
 
 function TidalPushEffect(effect)
   
-  if effect == lastPush and fxCount > 0 then
+  if fxIndex == lastFxIndex 
+	  and lastPush == effect 
+	  and fxCount > 0 then
 	  TidalIncFx(1)
 	  return
   end
@@ -130,6 +132,7 @@ function TidalPushEffect(effect)
   fxCount = fxCount + 1
   fxIndex = fxIndex + 1
 
+  lastFxIndex = fxIndex
   lastPush = effect
 
   SendFx()
@@ -237,6 +240,7 @@ function TidalResetEffects()
   effectsChain = ""
   fxIndex = 0
   fxCount = 0
+  lastFxIndex = nil
   lastPush = nil
   SendFx()
 end
@@ -254,6 +258,7 @@ function TidalResetEffectsUnsolo()
   effectsChain = ""
   fxIndex = 0
   fxCount = 0
+  lastFxIndex = nil
   lastPush = nil
   tidalSolo.TidalUnsoloAll()
   tidalSend.TidalSend('all $ id')
