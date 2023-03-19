@@ -23,13 +23,15 @@ local function ActiveLine()
 
   local align_right = '%='
 
+  local fxSetterValues = ': %{v:lua.fxBindings.GetFxBarValues()}'
+
   local rowcol = " %l,%c"
 
   local filename = ' %f'
 
   local modified = "%m" -- if buffer has unsaved modifications, will show [+]
 
-  local status = table.concat({hl, mode, soloed, fxchain, align_right, rowcol, 
+  local status = table.concat({hl, mode, soloed, fxchain, align_right, fxSetterValues, rowcol, 
               filename, modified},' ')
 
   return status
