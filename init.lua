@@ -114,6 +114,16 @@ vim.keymap.set({"i"}, "<M-7>", " 7", { silent = true })
 vim.keymap.set({"i"}, "<M-8>", " 8", { silent = true })
 vim.keymap.set({"i"}, "<M-9>", " 9", { silent = true })
 
+-- courtesy 
+-- https://www.reddit.com/r/neovim/comments/psux8f/comment/hdsfi9s/
+vim.keymap.set({"i"}, "<M-S-R>", function()
+		vimTidal.fxBindings.FxStringToReg('x')
+		local pos = vim.api.nvim_win_get_cursor(0)[2]
+		local line = vim.api.nvim_get_current_line()
+  		local nline = line:sub(0, pos) .. vim.fn.getreg('x') .. line:sub(pos + 1)
+		vim.api.nvim_set_current_line(nline)
+	end, { silent = true })
+
 -- vim.keymap.set({"i"}, "<M-[>", "[", { silent = true })
 -- vim.keymap.set({"i"}, "<M-[", "]", { silent = true })
 -- vim.keymap.set({"i"}, "<M-1>", " 1", { silent = true })

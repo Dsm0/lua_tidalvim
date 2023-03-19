@@ -9,6 +9,9 @@
 local tidalSolo = require('vim-tidal.tidalSolo')
 local tidalSend = require('vim-tidal.tidalSend')
 
+local setFxValueList = {0,1,2,3,4,5,6,7,8,9,10,11,12}
+local setFxValueOffset = 0
+
 local effectsChain = ''
 
 local fxIndex = 0
@@ -56,6 +59,11 @@ local function removeAt(s,i)
 	return headStr .. tailStr
 end
 
+
+
+
+
+
 local function replaceBetween(s,ns,first,last)
 	if ((first < 0) or (last > #s)) then
 		print("invalid index passed to 'removeAt': ", i)
@@ -69,15 +77,14 @@ local function replaceBetween(s,ns,first,last)
 end
 
 
-
-
-
-
-
+function M.GetFxBarValues()
+	-- return table.concat(setFxValueList,",") .. " off " .. setFxValueOffset
+	return "sv_off " .. setFxValueOffset
+end
 
 function M.GetFxStatus()
 
-	first, _ = getNthMatchRange('%a',effectsChain,fxIndex)
+	first, _ = getNthMatchRange('[_%a]',effectsChain,fxIndex)
 	
 	if #effectsChain == 0
 		then return INDEXCHAR
@@ -85,6 +92,8 @@ function M.GetFxStatus()
 	end
 
 end
+
+
 
 local function TidalFxIndexStart()
 	fxIndex = 0
@@ -123,7 +132,7 @@ function TidalPushEffect(effect)
   if fxIndex == lastFxIndex 
 	  and lastPush == effect 
 	  and fxCount > 0 then
-	  TidalIncFx(1)
+	  TidalIncFxVal(1)
 	  return
   end
 
@@ -176,7 +185,9 @@ function TidalRemoveEffect()
 		return
   end
 
-  first, last = getNthMatchRange('%a%d*,',effectsChain,fxIndex)
+-- edge case: when the last character is negative
+
+  first, last = getNthMatchRange('[_%a](-?%d+),',effectsChain,fxIndex)
   effectsChain = replaceBetween(effectsChain, '', first, last)
 
   fxCount = fxCount - 1
@@ -185,13 +196,27 @@ function TidalRemoveEffect()
 
 end
 
+local function shiftFxValueOffset(n)
+	willShift = function()
+		setFxValueOffset = setFxValueOffset + n
+	end
+	return willShift
+end
+
+local function resetFxValueOffset()
+	willShift = function()
+		setFxValueOffset = 0
+	end
+	return willShift
+end
+
 
 function TidalRemoveEffectRight()
 	TidalFxIndexRight()
 	TidalRemoveEffect()
 end
 
-function TidalIncFx(i)
+function TidalIncFxVal(i)
 	if fxCount == 0 then 
 		print("can't inc nothing")
 		return
@@ -204,20 +229,44 @@ function TidalIncFx(i)
 	first, last = getNthMatchRange('(-?%d+),',effectsChain,fxIndex)
 	val = tonumber(effectsChain:match('(-?%d+),',first-1))
 
-	-- there's some bug here 
-	-- I got val to be nil once, and I couldn't reproduce it
-	-- putting this here in the hopes I catch it again
 	if val == nil then
 		print(string.format('val was nil (???). first: %s last: %s fxIndex: %s fxChain: %s', first, last, fxIndex, effectsChain))
 		return
 	end
 
-	-- print('incFx: ',first,last, ' val: ', val)
 	val = val + i
 	effectsChain = replaceBetween(effectsChain, val, first, last-1)
 	SendFx()
-
 end
+
+function TidalSetFxVal(i)
+	if fxCount == 0 then 
+		print("can't inc nothing")
+		return
+	end
+
+	if fxIndex == 0 then 
+		TidalFxIndexRight()
+	end
+
+	first, last = getNthMatchRange('(-?%d+),',effectsChain,fxIndex)
+	val = i
+
+	if val == nil then
+		print(string.format('val was nil (???). first: %s last: %s fxIndex: %s fxChain: %s', first, last, fxIndex, effectsChain))
+		return
+	end
+
+	effectsChain = replaceBetween(effectsChain, val, first, last-1)
+	SendFx()
+end
+
+
+
+
+
+
+
 
 
 function TidalRestoreEffects()
@@ -279,12 +328,20 @@ function mkSoloBind(x)
 end
 
 
-function incFx(i)
+function incFxVal(i)
   willInc = function()
-	  TidalIncFx(i)
+	  TidalIncFxVal(i)
   end
   return willInc
 end
+
+function setFxVal(i)
+  willSet = function()
+	  TidalSetFxVal(i + setFxValueOffset)
+  end
+  return willSet
+end
+
 
 
 local tab = '\9'
@@ -370,12 +427,12 @@ M.bindings  = {
   
   -- [" "] = TidalToggleFront, -- TODO: find a good use of <space> in fxMode
   
-  ['-'] = incFx(-1), -- (function() tidalSend.TidalJumpSendBlock('do$') end) ,
-  ['='] = incFx(1), -- (function() tidalSend.TidalJumpSendBlock('do$','b') end),
-  ['_'] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
-  ['+'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
+  ['-'] = incFxVal(-1), -- (function() tidalSend.TidalJumpSendBlock('do$') end) ,
+  ['='] = incFxVal(1), -- (function() tidalSend.TidalJumpSendBlock('do$','b') end),
+
   ['['] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
   [']'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
+
   ['\t'] = "quit",
   [ret] = TidalResetEffects,
   ['`'] = TidalRemoveEffect,
@@ -389,31 +446,58 @@ M.bindings  = {
   ['<M-l>'] = TidalFxIndexRight,
   ['<M-L>'] = TidalFxIndexEnd,
 
-  -- ['<LeftArrow>'] = TidalFxIndexLeft,
-  -- ['<UpArrow>'] = mkEffectBind('»'),
-  -- ['<RightArrow>'] = TidalFxIndexRight,
+  [' '] = mkEffectBind("_"), 
 
-  [')'] = (function() tidalSend.TidalMarkSendBlock('0') end),
-  ['!'] = (function() tidalSend.TidalMarkSendBlock('1') end),
-  ['@'] = (function() tidalSend.TidalMarkSendBlock('2') end),
-  ['#'] = (function() tidalSend.TidalMarkSendBlock('3') end),
-  ['$'] = (function() tidalSend.TidalMarkSendBlock('4') end),
-  ['%'] = (function() tidalSend.TidalMarkSendBlock('5') end),
-  ['^'] = (function() tidalSend.TidalMarkSendBlock('6') end),
-  ['&'] = (function() tidalSend.TidalMarkSendBlock('7') end),
-  ['*'] = (function() tidalSend.TidalMarkSendBlock('8') end),
-  ['('] = (function() tidalSend.TidalMarkSendBlock('9') end),
+  -- -- space will mean 'id', in case you want to use the shift bindings below
+  -- -- to control a param, but want to perform an operation on that param first
+  -- -- ex. I want to halve the speed before I start using the key-bar, but
+  -- -- I have no way of inputting the same value twice without just incrementing it
+  -- -- so I just put a space
+  -- -- s-5,_1,s3
 
-  ['<M-0>'] = (function () TidalMkMark('0') end),
-  ['<M-1>'] = (function () TidalMkMark('1') end),
-  ['<M-2>'] = (function () TidalMkMark('2') end),
-  ['<M-3>'] = (function () TidalMkMark('3') end),
-  ['<M-4>'] = (function () TidalMkMark('4') end),
-  ['<M-5>'] = (function () TidalMkMark('5') end),
-  ['<M-6>'] = (function () TidalMkMark('6') end),
-  ['<M-7>'] = (function () TidalMkMark('7') end),
-  ['<M-8>'] = (function () TidalMkMark('8') end),
-  ['<M-9>'] = (function () TidalMkMark('9') end),
+  -- shift + num-keys
+  -- play a val with the keyboard
+  -- (key-bar)
+  ['~'] = setFxVal(setFxValueList[1]),
+  ['!'] = setFxVal(setFxValueList[2]),
+  ['@'] = setFxVal(setFxValueList[3]),
+  ['#'] = setFxVal(setFxValueList[4]),
+  ['$'] = setFxVal(setFxValueList[5]),
+  ['%'] = setFxVal(setFxValueList[6]),
+  ['^'] = setFxVal(setFxValueList[7]),
+  ['&'] = setFxVal(setFxValueList[8]),
+  ['*'] = setFxVal(setFxValueList[9]),
+  ['('] = setFxVal(setFxValueList[10]),
+  [')'] = setFxVal(setFxValueList[11]),
+  ['_'] = setFxVal(setFxValueList[12]),
+  ['+'] = setFxVal(setFxValueList[13]),
+
+  ['<M-_>'] = shiftFxValueOffset(-12),
+  ['<M-+>'] = shiftFxValueOffset(12),
+  ['<M-S-BS>'] = resetFxValueOffset(),
+
+
+  ['<M-0>'] = (function() tidalSend.TidalMarkSendBlock('0') end),
+  ['<M-1>'] = (function() tidalSend.TidalMarkSendBlock('1') end),
+  ['<M-2>'] = (function() tidalSend.TidalMarkSendBlock('2') end),
+  ['<M-3>'] = (function() tidalSend.TidalMarkSendBlock('3') end),
+  ['<M-4>'] = (function() tidalSend.TidalMarkSendBlock('4') end),
+  ['<M-5>'] = (function() tidalSend.TidalMarkSendBlock('5') end),
+  ['<M-6>'] = (function() tidalSend.TidalMarkSendBlock('6') end),
+  ['<M-7>'] = (function() tidalSend.TidalMarkSendBlock('7') end),
+  ['<M-8>'] = (function() tidalSend.TidalMarkSendBlock('8') end),
+  ['<M-9>'] = (function() tidalSend.TidalMarkSendBlock('9') end),
+
+  ['<M-S-0>'] = (function () TidalMkMark('0') end),
+  ['<M-S-1>'] = (function () TidalMkMark('1') end),
+  ['<M-S-2>'] = (function () TidalMkMark('2') end),
+  ['<M-S-3>'] = (function () TidalMkMark('3') end),
+  ['<M-S-4>'] = (function () TidalMkMark('4') end),
+  ['<M-S-5>'] = (function () TidalMkMark('5') end),
+  ['<M-S-6>'] = (function () TidalMkMark('6') end),
+  ['<M-S-7>'] = (function () TidalMkMark('7') end),
+  ['<M-S-8>'] = (function () TidalMkMark('8') end),
+  ['<M-S-9>'] = (function () TidalMkMark('9') end),
 
   [esc] = "quit",
 
