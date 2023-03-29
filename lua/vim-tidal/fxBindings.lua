@@ -18,8 +18,27 @@ local fxIndex = 0
 local fxCount  = 0
 local lastPush = nil
 
+local valBar = false
+
 local INDEXCHAR = '+'
 local M = {}
+
+local function toggleBar()
+	valBar = not(valBar)
+	-- print("AHHHHHHHHHHH: ", valBar)
+end
+
+function M.GetBarStatus()
+	if valBar
+		then return "################################"
+		else return ""
+	end
+end
+
+function M.getBar()
+	return valBar
+end
+
 
 local function insertAt(s,c,i)
 	if ((i < 0) or (i > #s)) then
@@ -210,6 +229,12 @@ local function resetFxValueOffset()
 	return willShift
 end
 
+local function barToggleBind(f1, f2)
+	return function()
+		if valBar then return f2() else return f1() end
+	end
+end
+
 
 function TidalRemoveEffectRight()
 	TidalFxIndexRight()
@@ -260,22 +285,6 @@ function TidalSetFxVal(i)
 	effectsChain = replaceBetween(effectsChain, val, first, last-1)
 	SendFx()
 end
-
-
-
-
-
-
-
-
-
-function TidalRestoreEffects()
-  SendFx()
-end
-
-
-
-
 
 
 
@@ -413,29 +422,32 @@ M.bindings  = {
   ['X'] = mkEffectBind("X"),  
   ['Y'] = mkEffectBind("Y"), 
   ['Z'] = mkEffectBind("Z"),  
-  ["1"] = mkSoloBind(1),
-  ["2"] = mkSoloBind(2),
-  ["3"] = mkSoloBind(3),
-  ["4"] = mkSoloBind(4),
-  ["5"] = mkSoloBind(5),
-  ["6"] = mkSoloBind(6),
-  ["7"] = mkSoloBind(7),
-  ["8"] = mkSoloBind(8),
-  ["9"] = mkSoloBind(9),
-  ["0"] = tidalSolo.TidalUnsoloAll,
+
+
+
+  ["`"] = barToggleBind(TidalRemoveEffect,setFxVal(setFxValueList[1])),
+  ["1"] = barToggleBind(mkSoloBind(1),setFxVal(setFxValueList[2])),
+  ["2"] = barToggleBind(mkSoloBind(2),setFxVal(setFxValueList[3])),
+  ["3"] = barToggleBind(mkSoloBind(3),setFxVal(setFxValueList[4])),
+  ["4"] = barToggleBind(mkSoloBind(4),setFxVal(setFxValueList[5])),
+  ["5"] = barToggleBind(mkSoloBind(5),setFxVal(setFxValueList[6])),
+  ["6"] = barToggleBind(mkSoloBind(6),setFxVal(setFxValueList[7])),
+  ["7"] = barToggleBind(mkSoloBind(7),setFxVal(setFxValueList[8])),
+  ["8"] = barToggleBind(mkSoloBind(8),setFxVal(setFxValueList[9])),
+  ["9"] = barToggleBind(mkSoloBind(9),setFxVal(setFxValueList[10])),
+  ["0"] = barToggleBind(tidalSolo.TidalUnsoloAll,setFxVal(setFxValueList[10])),
   [")"] = TidalClearEffectsUnsolo,
   
   -- [" "] = TidalToggleFront, -- TODO: find a good use of <space> in fxMode
   
-  ['-'] = incFxVal(-1), -- (function() tidalSend.TidalJumpSendBlock('do$') end) ,
-  ['='] = incFxVal(1), -- (function() tidalSend.TidalJumpSendBlock('do$','b') end),
+  ['-'] = barToggleBind(incFxVal(-1),setFxVal(setFxValueList[11])),
+  ['='] = barToggleBind(incFxVal(1),setFxVal(setFxValueList[12])),
 
   ['['] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
   [']'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
 
   ['\t'] = "quit",
   [ret] = TidalResetEffects,
-  ['`'] = TidalRemoveEffect,
   ['<BS>'] = TidalRemoveEffect,
   ['<M-BS>'] = TidalRemoveEffect,
   ['<Del>'] = TidalRemoveEffectRight,
@@ -446,7 +458,7 @@ M.bindings  = {
   ['<M-l>'] = TidalFxIndexRight,
   ['<M-L>'] = TidalFxIndexEnd,
 
-  [' '] = mkEffectBind("_"), 
+  [' '] = function() toggleBar() end,
 
   -- -- space will mean 'id', in case you want to use the shift bindings below
   -- -- to control a param, but want to perform an operation on that param first
@@ -458,6 +470,7 @@ M.bindings  = {
   -- shift + num-keys
   -- play a val with the keyboard
   -- (key-bar)
+
   ['~'] = setFxVal(setFxValueList[1]),
   ['!'] = setFxVal(setFxValueList[2]),
   ['@'] = setFxVal(setFxValueList[3]),
@@ -472,8 +485,8 @@ M.bindings  = {
   ['_'] = setFxVal(setFxValueList[12]),
   ['+'] = setFxVal(setFxValueList[13]),
 
-  ['<M-_>'] = shiftFxValueOffset(-12),
-  ['<M-+>'] = shiftFxValueOffset(12),
+  ['<M-_>'] = shiftFxValueOffset(-6),
+  ['<M-+>'] = shiftFxValueOffset(6),
   ['<M-S-BS>'] = resetFxValueOffset(),
 
 
