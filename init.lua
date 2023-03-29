@@ -113,6 +113,7 @@ vim.keymap.set({"i"}, "<M-6>", " 6", { silent = true })
 vim.keymap.set({"i"}, "<M-7>", " 7", { silent = true })
 vim.keymap.set({"i"}, "<M-8>", " 8", { silent = true })
 vim.keymap.set({"i"}, "<M-9>", " 9", { silent = true })
+vim.keymap.set({"i"}, "<M-`>", " ~", { silent = true })
 
 -- courtesy 
 -- https://www.reddit.com/r/neovim/comments/psux8f/comment/hdsfi9s/
@@ -124,6 +125,8 @@ vim.keymap.set({"i"}, "<M-S-R>", function()
 		vim.api.nvim_set_current_line(nline)
 	end, { silent = true })
 
+
+vim.cmd("set scrollback=100") -- I think that 
 -- vim.keymap.set({"i"}, "<M-[>", "[", { silent = true })
 -- vim.keymap.set({"i"}, "<M-[", "]", { silent = true })
 -- vim.keymap.set({"i"}, "<M-1>", " 1", { silent = true })
