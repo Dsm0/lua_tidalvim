@@ -352,6 +352,13 @@ function setFxVal(i)
 end
 
 
+function id()
+	willId = function ()
+		return
+	end
+	return willId
+end
+
 
 local tab = '\9'
 local esc = '\x1b'
@@ -440,8 +447,8 @@ M.bindings  = {
   
   -- [" "] = TidalToggleFront, -- TODO: find a good use of <space> in fxMode
   
-  ['-'] = barToggleBind(incFxVal(-1),setFxVal(setFxValueList[11])),
-  ['='] = barToggleBind(incFxVal(1),setFxVal(setFxValueList[12])),
+  ['-'] = barToggleBind(incFxVal(-1),setFxVal(setFxValueList[12])),
+  ['='] = barToggleBind(incFxVal(1),setFxVal(setFxValueList[13])),
 
   ['['] = (function() tidalSend.TidalJumpSendBlock('do$','b') end),
   [']'] = (function() tidalSend.TidalJumpSendBlock('do$') end) ,
@@ -460,30 +467,23 @@ M.bindings  = {
 
   [' '] = function() toggleBar() end,
 
-  -- -- space will mean 'id', in case you want to use the shift bindings below
-  -- -- to control a param, but want to perform an operation on that param first
-  -- -- ex. I want to halve the speed before I start using the key-bar, but
-  -- -- I have no way of inputting the same value twice without just incrementing it
-  -- -- so I just put a space
-  -- -- s-5,_1,s3
-
   -- shift + num-keys
   -- play a val with the keyboard
   -- (key-bar)
 
-  ['~'] = setFxVal(setFxValueList[1]),
-  ['!'] = setFxVal(setFxValueList[2]),
-  ['@'] = setFxVal(setFxValueList[3]),
-  ['#'] = setFxVal(setFxValueList[4]),
-  ['$'] = setFxVal(setFxValueList[5]),
-  ['%'] = setFxVal(setFxValueList[6]),
-  ['^'] = setFxVal(setFxValueList[7]),
-  ['&'] = setFxVal(setFxValueList[8]),
-  ['*'] = setFxVal(setFxValueList[9]),
-  ['('] = setFxVal(setFxValueList[10]),
-  [')'] = setFxVal(setFxValueList[11]),
-  ['_'] = setFxVal(setFxValueList[12]),
-  ['+'] = setFxVal(setFxValueList[13]),
+  ['~'] = barToggleBind(setFxVal(setFxValueList[1]) ,TidalRemoveEffect) ,
+  ['!'] = barToggleBind(setFxVal(setFxValueList[2]) ,mkSoloBind(1)),
+  ['@'] = barToggleBind(setFxVal(setFxValueList[3]) ,mkSoloBind(2)),
+  ['#'] = barToggleBind(setFxVal(setFxValueList[4]) ,mkSoloBind(3)),
+  ['$'] = barToggleBind(setFxVal(setFxValueList[5]) ,mkSoloBind(4)),
+  ['%'] = barToggleBind(setFxVal(setFxValueList[6]) ,mkSoloBind(5)),
+  ['^'] = barToggleBind(setFxVal(setFxValueList[7]) ,mkSoloBind(6)),
+  ['&'] = barToggleBind(setFxVal(setFxValueList[8]) ,mkSoloBind(7)),
+  ['*'] = barToggleBind(setFxVal(setFxValueList[9]) ,mkSoloBind(8)),
+  ['('] = barToggleBind(setFxVal(setFxValueList[10]),mkSoloBind(9)),
+  [')'] = barToggleBind(setFxVal(setFxValueList[11]),id),
+  ['_'] = barToggleBind(setFxVal(setFxValueList[12]),incFxVal(-1)),
+  ['+'] = barToggleBind(setFxVal(setFxValueList[13]),incFxVal(1)),
 
   ['<M-_>'] = shiftFxValueOffset(-6),
   ['<M-+>'] = shiftFxValueOffset(6),
