@@ -19,9 +19,10 @@ local function ActiveLine()
 
   local soloed = '%{v:lua.tidalSolo.TidalSoloedAsString()}'
 
-  local fxchain = ': %{v:lua.fxBindings.GetFxStatus()}'
 
   local align_right = '%='
+
+  local fxchain = ': %{v:lua.fxBindings.GetFxStatus()}'
 
   local barStatus = ': %{v:lua.fxBindings.GetBarStatus()}'
 
@@ -33,8 +34,8 @@ local function ActiveLine()
 
   local modified = "%m" -- if buffer has unsaved modifications, will show [+]
 
-  local status = table.concat({hl, mode, soloed, fxchain, 
-				align_right, barStatus, fxSetterValues, rowcol, 
+  local status = table.concat({hl, mode, soloed, align_right, fxchain, 
+				barStatus, fxSetterValues, rowcol, 
 				filename, modified},' ')
 
   return status
