@@ -18,6 +18,8 @@ local fxIndex = 0
 local fxCount  = 0
 local lastPush = nil
 
+local incScale = 1
+
 local valBar = false
 
 local INDEXCHAR = '+'
@@ -25,12 +27,11 @@ local M = {}
 
 local function toggleBar()
 	valBar = not(valBar)
-	-- print("AHHHHHHHHHHH: ", valBar)
 end
 
 function M.GetBarStatus()
 	if valBar
-		then return "################################"
+		then return "#̷̧̧̧̡̨̧̲͙̩̜̺̥͈̣̤̺̩̥̼̻̝̝̬̱̼̭̠̖̰̺͍̞̖͔̘͈̩̪̖̗̗̭̱̱̱͎͉̩̻̣̲̩͔̳̗̮͖̱͎̼̟̱̬̦̺͓̼̹̺̟̦̣͎͖͉̱̤͇̯̺͔̠̹͈̻̜̪̗̼̩̮̙̺͈̘̫̗͕̫̦̺̙̹͚̙̱̳̘̭̤́͛͒̋̈́̓̀̒͒̋̎̒̅̓̒̃̓̏̎̑͗͋̈̌̈́̅̔͆̑͐́͘͠͝͝ͅͅͅͅͅͅ#̵̡̢̨̨̡̡̡̨̨̛̭̩̺̪͖̯͖̠͔̹̹̮̭̟͈͎̮̣̳̼̯̣͔̙̩͓̭̼̥͙͍͇̹̰̰̫̰̝̹͓̰͔̮̠̱͇̥̬̭̦̦͓͖͕̫̫̤̘͍̭͕͕̠̦͈̝̹̺̦̬̣̼̜͉̜͍̰̘̲̤̮͇͚͐̂̎̍͒̔͌̂̊́̏͑̉̃̓̑̉̎̑̈͌̄͌͑̽̈́̅́̐̔́̈́̍̂̆͊͑͋̈̿͂͑͋̈́̍͆͛̉͊̓͘̕̕̚̕͜͜͜͝͝ͅͅͅ#̵̨̨̨̨̨̢̡̨̢̧̡̡̧̛̛̪̺͓̤̹̹̱̥͚̯̮̹̱̟̥͎͓̙̫̗̪̟̥̹̣̗͕̬̮͉̩̭̳͇̪̲͎̗̪̝͈̗̟͙̲̬̞̯̺̩̝͚̥̱͚̟̹͈͈̰̯̙̬̺̲͕̬̼̞̲̰̺͔͙͉͚̤̫̞̘͙͍̪̯͇̳͍̝̩̪̤̬̏̀̾̾̊̐̅̅̉̒̌͐̊̈́͛̆͂̎̌̀̋̆̅̇̌̈́̇͐̏̑̔̈́́̂̑̇͛̎̄̇̀͛̈̿̓̓̒̃̓͊̀̆̌̆͑͌̋͑͘̕̚̚̕͜͜͜͠͝͝ͅͅͅͅͅ"
 		else return ""
 	end
 end
@@ -98,7 +99,7 @@ end
 
 function M.GetFxBarValues()
 	-- return table.concat(setFxValueList,",") .. " off " .. setFxValueOffset
-	return "sv_off " .. setFxValueOffset
+	return "incBy: " .. incScale .." off: " .. setFxValueOffset
 end
 
 function M.GetFxStatus()
@@ -151,7 +152,7 @@ function TidalPushEffect(effect)
   if fxIndex == lastFxIndex 
 	  and lastPush == effect 
 	  and fxCount > 0 then
-	  TidalIncFxVal(1)
+	  TidalIncFxVal(incScale)
 	  return
   end
 
@@ -324,7 +325,7 @@ end
 
 function mkEffectBind(x)
   willPush = function()
-    TidalPushEffect(x .. '1,')
+    TidalPushEffect(x .. incScale .. ',')
   end
   return willPush
 end
@@ -339,10 +340,19 @@ end
 
 function incFxVal(i)
   willInc = function()
-	  TidalIncFxVal(i)
+	  TidalIncFxVal(i*incScale)
   end
   return willInc
 end
+
+function incIncScale(i)
+  willInc = function()
+	  incScale = incScale + i
+  end
+  return willInc
+end
+
+
 
 function setFxVal(i)
   willSet = function()
@@ -456,7 +466,6 @@ M.bindings  = {
   ['\t'] = "quit",
   [ret] = TidalResetEffects,
   ['<BS>'] = TidalRemoveEffect,
-  ['<M-BS>'] = TidalRemoveEffect,
   ['<Del>'] = TidalRemoveEffectRight,
   ['<S-Enter>'] = TidalResetEffectsUnsolo,
 
@@ -500,6 +509,11 @@ M.bindings  = {
   ['<M-7>'] = (function() tidalSend.TidalMarkSendBlock('7') end),
   ['<M-8>'] = (function() tidalSend.TidalMarkSendBlock('8') end),
   ['<M-9>'] = (function() tidalSend.TidalMarkSendBlock('9') end),
+
+  ['<M-->'] = incIncScale(-1),
+  ['<M-=>'] = incIncScale(1),
+  ['<M-BS>'] = (function () incScale = 1 end),
+
 
   ['<M-S-0>'] = (function () TidalMkMark('0') end),
   ['<M-S-1>'] = (function () TidalMkMark('1') end),
