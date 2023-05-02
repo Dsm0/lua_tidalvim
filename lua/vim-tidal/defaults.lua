@@ -33,7 +33,8 @@ function M.set_default_mappings()
   vim.keymap.set({"n","i","s"},"<M-D>", function() tidalSend.TidalJumpSendBlock('do$','b') end, {silent = true})
 
 
-  local searchstring="[\\$\\|\\#\\|&\\|\\|+]"
+  -- local searchstring="[\\$\\|\\#\\|&\\|\\|+]"
+  local searchstring="[\\$\\|#\\|*\\|+]"
 
   vim.keymap.set({""},"H", "?" .. searchstring .. "<CR>", {silent = true})
   vim.keymap.set({""},"L", "/" .. searchstring .. "<CR>", {silent = true})
