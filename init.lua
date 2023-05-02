@@ -101,7 +101,7 @@ vim.cmd("highlight CursorColumn ctermbg=none ctermfg=none cterm=italic,bold")
 
 
 vim.keymap.set({"i"}, "<M-BS>", "<BS><BS>", { silent = true })
-vim.keymap.set({"i"}, "<M-0>", " 0", { silent = true })
+vim.keymap.set({"i"}, "<M-`>", " ~", { silent = true })
 vim.keymap.set({"i"}, "<M-1>", " 1", { silent = true })
 vim.keymap.set({"i"}, "<M-2>", " 2", { silent = true })
 vim.keymap.set({"i"}, "<M-3>", " 3", { silent = true })
@@ -113,7 +113,9 @@ vim.keymap.set({"i"}, "<M-6>", " 6", { silent = true })
 vim.keymap.set({"i"}, "<M-7>", " 7", { silent = true })
 vim.keymap.set({"i"}, "<M-8>", " 8", { silent = true })
 vim.keymap.set({"i"}, "<M-9>", " 9", { silent = true })
-vim.keymap.set({"i"}, "<M-`>", " ~", { silent = true })
+vim.keymap.set({"i"}, "<M-0>", " 0", { silent = true })
+vim.keymap.set({"i"}, "<M-->", " 11", { silent = true })
+vim.keymap.set({"i"}, "<M-=>", " 12", { silent = true })
 
 -- courtesy 
 -- https://www.reddit.com/r/neovim/comments/psux8f/comment/hdsfi9s/
