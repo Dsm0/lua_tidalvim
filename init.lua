@@ -123,7 +123,7 @@ vim.keymap.set({"i"}, "<M-S-R>", function()
 		vimTidal.fxBindings.FxStringToReg('x')
 		local pos = vim.api.nvim_win_get_cursor(0)[2]
 		local line = vim.api.nvim_get_current_line()
-  		local nline = line:sub(0, pos) .. vim.fn.getreg('x') .. line:sub(pos + 1)
+  		local nline = line:sub(0, pos) .. "$ " .. vim.fn.getreg('x') .. " " .. line:sub(pos + 1)
 		vim.api.nvim_set_current_line(nline)
 	end, { silent = true })
 

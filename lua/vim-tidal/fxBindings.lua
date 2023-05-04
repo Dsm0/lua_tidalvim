@@ -494,6 +494,8 @@ M.bindings  = {
   ['_'] = barToggleBind(setFxVal(setFxValueList[12]),incFxVal(-1)),
   ['+'] = barToggleBind(setFxVal(setFxValueList[13]),incFxVal(1)),
 
+  ['\\'] = (function() TidalClearEffects() end),
+
   ['<M-_>'] = shiftFxValueOffset(-6),
   ['<M-+>'] = shiftFxValueOffset(6),
   ['<M-S-BS>'] = resetFxValueOffset(),
