@@ -23,7 +23,12 @@ so if you don't already have that folder on your path, just add
 `export PATH=$PATH:~/.local/bin`
 to your `.bashrc` or `.zshrc` or whatever you use
 
+# Tool in use:
+[https://youtu.be/IwFe3TpDd2g](https://youtu.be/IwFe3TpDd2g)
+[https://youtu.be/9-mVCYohL5c](https://youtu.be/9-mVCYohL5c)
+
 # TODO
+- document binding system
 - simplify fxBindings system
 - add more support for config files specifying fxBindings
 
