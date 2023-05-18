@@ -6,6 +6,10 @@
 -- this file might balloon in complexity and warrent its own seperate 
 -- directory, but the keyboard interface this implements is what I'm used to
 
+local queue = loadfile(vim.g.tidalvim_root .. '/fxBindings/queue.lua')()
+
+local fxHistory = queue.new()
+
 local tidalSolo = require('vim-tidal.tidalSolo')
 local tidalSend = require('vim-tidal.tidalSend')
 
@@ -23,6 +27,8 @@ local incScale = 1
 local valBar = false
 
 local INDEXCHAR = '+'
+
+
 local M = {}
 
 local function toggleBar()
@@ -137,10 +143,28 @@ end
 
 
 local function SendFx()
+  queue.pushleft(fxHistory,{effectsChain,fxIndex})
   local tosend = 'all $ ' .. getFxString()
---   local tosend = 'all $ effStr "' .. effectsChain .. '"'
 
   tidalSend.TidalSend(tosend)
+end
+
+
+local function prevFx()
+  if(not(queue.isEmpty(fxHistory)))
+	then 
+	  new_effectsChain, new_fxIndex = unpack(queue.popleft(fxHistory))
+	  if(new_effectsChain == effectsChain)
+	    then 
+		  effectsChain, fxIndex = unpack(queue.popleft(fxHistory))
+		else 
+		  effectsChain, fxIndex = new_effectsChain, new_fxIndex
+	  end
+	  local tosend = 'all $ ' .. getFxString()
+  	  tidalSend.TidalSend(tosend)
+	else
+	  print("fxHistory empty")
+  end
 end
 
 function TidalPushEffect(effect)
@@ -371,6 +395,7 @@ local esc = '\x1b'
 local ret = '\13' -- return
 
 
+
 -- NOTE:
 -- any more complex combo of bindings
 -- like <M-Del>
@@ -435,7 +460,6 @@ M.bindings  = {
   ['X'] = mkEffectBind("X"),  
   ['Y'] = mkEffectBind("Y"), 
   ['Z'] = mkEffectBind("Z"),  
-
 
 
   ["`"] = barToggleBind(TidalRemoveEffect,setFxVal(setFxValueList[1])),
@@ -525,6 +549,8 @@ M.bindings  = {
   ['<M-S-7>'] = (function () TidalMkMark('7') end),
   ['<M-S-8>'] = (function () TidalMkMark('8') end),
   ['<M-S-9>'] = (function () TidalMkMark('9') end),
+
+  ['<Up>'] = (function () prevFx() end),
 
   [esc] = "quit",
 
