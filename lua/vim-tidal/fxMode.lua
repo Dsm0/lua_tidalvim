@@ -1,13 +1,22 @@
 local tidalSend = require("vim-tidal.tidalSend")
-local fxBindings = require('vim-tidal.fxBindings')
-local bindings = fxBindings.bindings
 local specialChars = require('vim-tidal.specialChars').specialChars
 
 local M = {}
 
+local fxBindings
+local bindings
 
+function M.setFxBindings(new_fxBindings) 
+	fxBindings = new_fxBindings
+	bindings = new_fxBindings.bindings
+end
 
 function M.FxMode()
+  if (fxBindings == nil) then
+	  vim.notify("ERROR: must load fxBindings in init.lua with:\n require('vim-tidal.fxMode').setFxBindings(<your fxBindings bindings )")
+	  return
+  end
+
   vim.cmd("highlight Normal ctermbg=DarkGray")
 
   char = vim.fn.getchar()

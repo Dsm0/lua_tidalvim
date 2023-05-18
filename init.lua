@@ -1,9 +1,4 @@
--- https://stackoverflow.com/questions/73358168/where-can-i-check-my-neovim-lua-runtimepath
--- ^^^^ check out to resolve path lua plugin issues
-
--- NOTE: needs to be the root directory of lua_tidalvim
-
-
+-- NOTE: run `make` and ensure lua_tidalvim is linked to "~/.local/share/lua_tidalvim"
 
 -- https://stackoverflow.com/a/69142336
 local function tc(str)
@@ -19,10 +14,13 @@ vim.o.runtimepath = vim.o.runtimepath .. ", "
 
 local vimTidal = require('vim-tidal')
 
-
 vimTidal.defaults.set_default_mappings()
 vimTidal.defaults.set_default_settings()
 vimTidal.defaults.load_default_plugins()
+
+fxBindings = loadfile(vim.g.tidalvim_root .. '/fxBindings/fxBindings.lua')()
+statusLine = loadfile(vim.g.tidalvim_root .. '/fxBindings/statusLine.lua')()
+vimTidal.fxMode.setFxBindings(fxBindings)
 
 
 -- anything past this line I consider my own configuration
