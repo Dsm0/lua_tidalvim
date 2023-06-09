@@ -143,7 +143,7 @@ end
 
 
 local function SendFx()
-  queue.pushleft(fxHistory,{effectsChain,fxIndex})
+  queue.pushleft(fxHistory,{effectsChain,fxIndex,fxCount})
   local tosend = 'all $ ' .. getFxString()
 
   tidalSend.TidalSend(tosend)
@@ -153,12 +153,12 @@ end
 local function prevFx()
   if(not(queue.isEmpty(fxHistory)))
 	then 
-	  new_effectsChain, new_fxIndex = unpack(queue.popleft(fxHistory))
-	  if(new_effectsChain == effectsChain)
+	  new_effectsChain, new_fxIndex, newFxCount = unpack(queue.popleft(fxHistory))
+	  if(new_effectsChain == effectsChain) -- lol why do I have this?
 	    then 
-		  effectsChain, fxIndex = unpack(queue.popleft(fxHistory))
+		  effectsChain, fxIndex, newFxCount = unpack(queue.popleft(fxHistory))
 		else 
-		  effectsChain, fxIndex = new_effectsChain, new_fxIndex
+		  effectsChain, fxIndex, fxCount = new_effectsChain, new_fxIndex, newFxCount
 	  end
 	  local tosend = 'all $ ' .. getFxString()
   	  tidalSend.TidalSend(tosend)
