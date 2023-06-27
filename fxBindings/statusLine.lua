@@ -29,7 +29,7 @@ local function ActiveLine()
 
   local rowcol = " %l,%c"
 
-  local filename = ' %f'
+  local filename = ' %t'
 
   local modified = "%m" -- if buffer has unsaved modifications, will show [+]
 
