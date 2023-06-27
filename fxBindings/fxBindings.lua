@@ -517,6 +517,7 @@ M.bindings  = {
   ['\\'] = (function() TidalClearEffects() end),
 
   ['<M-S-u>'] = (function() print("AHHHHHHHHHHHHHHHHHHHH") end),
+  ['<M-S-r>'] = tidalSolo.TidalResetCycles,
 
   ['<M-_>'] = shiftFxValueOffset(-6),
   ['<M-+>'] = shiftFxValueOffset(6),
