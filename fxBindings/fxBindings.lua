@@ -16,10 +16,9 @@ local tidalSend = require('vim-tidal.tidalSend')
 local setFxValueList = {0,1,2,3,4,5,6,7,8,9,10,11,12}
 local setFxValueOffset = 0
 
-local effectsChain = ''
+local effectsChain = {}
 
 local fxIndex = 0
-local fxCount  = 0
 local lastPush = nil
 
 local incScale = 1
@@ -60,17 +59,15 @@ local function insertAt(s,c,i)
 end
 
 local function insertFxAt(s,c,index)
-	if ((fxIndex < 0) or (fxIndex > fxCount)) then
+	if ((fxIndex < 0) or (fxIndex-1 > #effectsChain)) then
 		print("invalid fxIndex passed to 'insertFxAt': ", index)
 		return s
 	end
 	
-	local i, _ = getNthMatchRange(',',s,index)
+	table.insert(s,index,{c,1})
+	-- print(table.concat(s[0]))
 
-	local headStr = string.sub(s,1,i)
-	local tailStr = string.sub(s,i+1,-1)
-
-	return headStr .. c .. tailStr
+	return s
 end
 
 local function removeAt(s,i)
@@ -79,10 +76,9 @@ local function removeAt(s,i)
 		return s
 	end
 
-	local headStr = string.sub(s,1,i-1)
-	local tailStr = string.sub(s,i+1,-1)
+	table.remove(s,index)
 
-	return headStr .. tailStr
+	return s
 end
 
 
@@ -104,16 +100,7 @@ function M.GetFxBarValues()
 	return "incBy: " .. incScale .." off: " .. setFxValueOffset
 end
 
-function M.GetFxStatus()
 
-	first, _ = getNthMatchRange('[_%a]',effectsChain,fxIndex)
-	
-	if #effectsChain == 0
-		then return INDEXCHAR
-		else return insertAt(effectsChain,INDEXCHAR,first)
-	end
-
-end
 
 
 
@@ -122,11 +109,11 @@ local function TidalFxIndexStart()
 end
 
 local function TidalFxIndexEnd()
-	fxIndex = fxCount
+	fxIndex = #effectsChain
 end
 
 local function TidalFxIndexRight()
-	fxIndex = math.min(fxIndex + 1,fxCount)
+	fxIndex = math.min(fxIndex + 1,#effectsChain + 1)
 end
 
 local function TidalFxIndexLeft()
@@ -134,7 +121,38 @@ local function TidalFxIndexLeft()
 end
 
 local function getFxString()
-  return 'effStr "' .. effectsChain .. '"'
+
+  chainStr = ""
+
+  for index,effect in pairs(effectsChain) do
+	  chainStr = chainStr .. tostring(effect[1]) .. tostring(effect[2]) .. ','
+  end
+
+  return 'effStr "' .. chainStr .. '"'
+end
+
+
+function M.GetFxStatus()
+
+  chainStr = ""
+
+  if fxIndex == 0 then
+	chainStr = INDEXCHAR
+  end
+
+  for index,effect in pairs(effectsChain) do
+	  if(index == fxIndex ) then
+		chainStr = chainStr .. tostring(effect[1]) .. INDEXCHAR .. tostring(effect[2])
+	  else
+		chainStr = chainStr .. tostring(effect[1]) .. tostring(effect[2])
+	  end
+	  chainStr = chainStr .. ","
+  end
+
+  -- chainStr = chainStr .. " " .. fxIndex
+
+  return chainStr
+
 end
 
 function M.FxStringToReg(reg)
@@ -142,24 +160,35 @@ function M.FxStringToReg(reg)
 end
 
 
+local function deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        end
+        setmetatable(copy, deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
 local function SendFx()
-  queue.pushleft(fxHistory,{effectsChain,fxIndex,fxCount})
+  queue.pushleft(fxHistory,{deepcopy(effectsChain),fxIndex})
   local tosend = 'all $ ' .. getFxString()
 
   tidalSend.TidalSend(tosend)
 end
 
 
+
 local function prevFx()
   if(not(queue.isEmpty(fxHistory)))
 	then 
-	  new_effectsChain, new_fxIndex, newFxCount = unpack(queue.popleft(fxHistory))
-	  if(new_effectsChain == effectsChain) -- lol why do I have this?
-	    then 
-		  effectsChain, fxIndex, newFxCount = unpack(queue.popleft(fxHistory))
-		else 
-		  effectsChain, fxIndex, fxCount = new_effectsChain, new_fxIndex, newFxCount
-	  end
+	  new_effectsChain, new_fxIndex = unpack(queue.popleft(fxHistory))
+	  effectsChain, fxIndex = new_effectsChain, new_fxIndex
 	  local tosend = 'all $ ' .. getFxString()
   	  tidalSend.TidalSend(tosend)
 	else
@@ -171,15 +200,14 @@ function TidalPushEffect(effect)
   
   if fxIndex == lastFxIndex 
 	  and lastPush == effect 
-	  and fxCount > 0 then
+	  and #effectsChain > 0 then
 	  TidalIncFxVal(incScale)
 	  return
   end
 
-  effectsChain = insertFxAt(effectsChain,effect,fxIndex)
-
-  fxCount = fxCount + 1
   fxIndex = fxIndex + 1
+
+  effectsChain = insertFxAt(effectsChain,effect,fxIndex)
 
   lastFxIndex = fxIndex
   lastPush = effect
@@ -227,10 +255,11 @@ function TidalRemoveEffect()
 
 -- edge case: when the last character is negative
 
-  first, last = getNthMatchRange('[_%a](-?%d+),',effectsChain,fxIndex)
-  effectsChain = replaceBetween(effectsChain, '', first, last)
+  -- first, last = getNthMatchRange('[_%a](-?%d+),',effectsChain,fxIndex)
+  -- effectsChain = replaceBetween(effectsChain, '', first, last)
 
-  fxCount = fxCount - 1
+  table.remove(effectsChain,fxIndex)
+
   fxIndex = fxIndex - 1
   SendFx()
 
@@ -263,7 +292,7 @@ function TidalRemoveEffectRight()
 end
 
 function TidalIncFxVal(i)
-	if fxCount == 0 then 
+	if #effectsChain == 0 then 
 		print("can't inc nothing")
 		return
 	end
@@ -271,22 +300,14 @@ function TidalIncFxVal(i)
 	if fxIndex == 0 then 
 		TidalFxIndexRight()
 	end
+	
+	effectsChain[fxIndex][2] = effectsChain[fxIndex][2] + i
 
-	first, last = getNthMatchRange('(-?%d+),',effectsChain,fxIndex)
-	val = tonumber(effectsChain:match('(-?%d+),',first-1))
-
-	if val == nil then
-		print(string.format('val was nil (???). first: %s last: %s fxIndex: %s fxChain: %s', first, last, fxIndex, effectsChain))
-		return
-	end
-
-	val = val + i
-	effectsChain = replaceBetween(effectsChain, val, first, last-1)
 	SendFx()
 end
 
 function TidalSetFxVal(i)
-	if fxCount == 0 then 
+	if #effectsChain == 0 then 
 		print("can't inc nothing")
 		return
 	end
@@ -316,9 +337,8 @@ end
 
 
 function TidalResetEffects()
-  effectsChain = ""
+  effectsChain = {}
   fxIndex = 0
-  fxCount = 0
   lastFxIndex = nil
   lastPush = nil
   SendFx()
@@ -336,7 +356,6 @@ end
 function TidalResetEffectsUnsolo()
   effectsChain = ""
   fxIndex = 0
-  fxCount = 0
   lastFxIndex = nil
   lastPush = nil
   tidalSolo.TidalUnsoloAll()
@@ -345,7 +364,7 @@ end
 
 function mkEffectBind(x)
   willPush = function()
-    TidalPushEffect(x .. incScale .. ',')
+    TidalPushEffect(x)
   end
   return willPush
 end
@@ -519,8 +538,8 @@ M.bindings  = {
   ['<M-S-u>'] = (function() print("AHHHHHHHHHHHHHHHHHHHH") end),
   ['<M-S-r>'] = tidalSolo.TidalResetCycles,
 
-  ['<M-_>'] = shiftFxValueOffset(-6),
-  ['<M-+>'] = shiftFxValueOffset(6),
+  ['<M-_>'] = shiftFxValueOffset(-12),
+  ['<M-+>'] = shiftFxValueOffset(12),
   ['<M-S-BS>'] = resetFxValueOffset(),
 
 
