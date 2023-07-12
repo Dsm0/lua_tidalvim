@@ -19,7 +19,6 @@ local setFxValueOffset = 0
 local effectsChain = {}
 
 local fxIndex = 0
-local lastPush = nil
 
 local incScale = 1
 
@@ -113,7 +112,7 @@ local function TidalFxIndexEnd()
 end
 
 local function TidalFxIndexRight()
-	fxIndex = math.min(fxIndex + 1,#effectsChain + 1)
+	fxIndex = math.min(fxIndex + 1,#effectsChain)
 end
 
 local function TidalFxIndexLeft()
@@ -198,9 +197,7 @@ end
 
 function TidalPushEffect(effect)
   
-  if fxIndex == lastFxIndex 
-	  and lastPush == effect 
-	  and #effectsChain > 0 then
+  if #effectsChain > 0 and effect == effectsChain[fxIndex][1] then
 	  TidalIncFxVal(incScale)
 	  return
   end
@@ -208,9 +205,6 @@ function TidalPushEffect(effect)
   fxIndex = fxIndex + 1
 
   effectsChain = insertFxAt(effectsChain,effect,fxIndex)
-
-  lastFxIndex = fxIndex
-  lastPush = effect
 
   SendFx()
 end
@@ -316,15 +310,8 @@ function TidalSetFxVal(i)
 		TidalFxIndexRight()
 	end
 
-	first, last = getNthMatchRange('(-?%d+),',effectsChain,fxIndex)
-	val = i
+	effectsChain[fxIndex][2] = i
 
-	if val == nil then
-		print(string.format('val was nil (???). first: %s last: %s fxIndex: %s fxChain: %s', first, last, fxIndex, effectsChain))
-		return
-	end
-
-	effectsChain = replaceBetween(effectsChain, val, first, last-1)
 	SendFx()
 end
 
@@ -339,8 +326,6 @@ end
 function TidalResetEffects()
   effectsChain = {}
   fxIndex = 0
-  lastFxIndex = nil
-  lastPush = nil
   SendFx()
 end
 
@@ -354,10 +339,8 @@ function TidalClearEffectsUnsolo()
 end
 
 function TidalResetEffectsUnsolo()
-  effectsChain = ""
+  effectsChain = {}
   fxIndex = 0
-  lastFxIndex = nil
-  lastPush = nil
   tidalSolo.TidalUnsoloAll()
   tidalSend.TidalSend('all $ id')
 end
@@ -400,6 +383,18 @@ function setFxVal(i)
   return willSet
 end
 
+
+function trySetFxIndex(i)
+	willTry = function()
+		if #effectsChain > i then
+			fxIndex = i
+		else
+			print(string.format("invalid fxIndex: %s", fxIndex))
+		end
+	end
+	return willTry
+end
+	  
 
 function id()
 	willId = function ()
@@ -543,19 +538,29 @@ M.bindings  = {
   ['<M-S-BS>'] = resetFxValueOffset(),
 
 
-  ['<M-0>'] = (function() tidalSend.TidalMarkSendBlock('0') end),
-  ['<M-1>'] = (function() tidalSend.TidalMarkSendBlock('1') end),
-  ['<M-2>'] = (function() tidalSend.TidalMarkSendBlock('2') end),
-  ['<M-3>'] = (function() tidalSend.TidalMarkSendBlock('3') end),
-  ['<M-4>'] = (function() tidalSend.TidalMarkSendBlock('4') end),
-  ['<M-5>'] = (function() tidalSend.TidalMarkSendBlock('5') end),
-  ['<M-6>'] = (function() tidalSend.TidalMarkSendBlock('6') end),
-  ['<M-7>'] = (function() tidalSend.TidalMarkSendBlock('7') end),
-  ['<M-8>'] = (function() tidalSend.TidalMarkSendBlock('8') end),
-  ['<M-9>'] = (function() tidalSend.TidalMarkSendBlock('9') end),
+  ['<M-0>'] = trySetFxIndex(0),
+  ['<M-1>'] = trySetFxIndex(1),
+  ['<M-2>'] = trySetFxIndex(2),
+  ['<M-3>'] = trySetFxIndex(3),
+  ['<M-4>'] = trySetFxIndex(4),
+  ['<M-5>'] = trySetFxIndex(5),
+  ['<M-6>'] = trySetFxIndex(6),
+  ['<M-7>'] = trySetFxIndex(7),
+  ['<M-8>'] = trySetFxIndex(8),
+  ['<M-9>'] = trySetFxIndex(9),
 
-  ['<M-->'] = incIncScale(-1),
-  ['<M-=>'] = incIncScale(1),
+  ['<M-->'] = (function () 
+	  if #effectsChain > 0 then
+		effectsChain[fxIndex][2] = math.floor(effectsChain[fxIndex][2] / 2)
+		SendFx()
+	  end
+  end),
+  ['<M-=>'] = (function () 
+	  if #effectsChain > 0 then
+		effectsChain[fxIndex][2] = effectsChain[fxIndex][2] * 2
+		SendFx()
+	  end
+  end),
   ['<M-BS>'] = (function () incScale = 1 end),
 
 
