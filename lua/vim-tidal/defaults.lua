@@ -26,7 +26,7 @@ function M.set_default_mappings()
 
   vim.keymap.set({"n"},"<Tab>", fxMode.FxMode, {silent = true})
 
-  vim.keymap.set({"n","i","s"},"<M-R>", tidalSolo.TidalResetCycles, {silent = true})
+  vim.keymap.set({"n","i","s"},"<M-r>", tidalSolo.TidalResetCycles, {silent = true})
 
   vim.keymap.set({"n","i","s"},"<M-d>", function() tidalSend.TidalJumpSendBlock('do$') end, {silent = true})
   

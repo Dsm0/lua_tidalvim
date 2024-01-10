@@ -197,7 +197,9 @@ end
 
 function TidalPushEffect(effect)
   
-  if #effectsChain > 0 and effect == effectsChain[fxIndex][1] then
+  if #effectsChain > 0 
+	  and fxIndex ~= 0
+	  and effect == effectsChain[fxIndex][1] then
 	  TidalIncFxVal(incScale)
 	  return
   end
@@ -386,7 +388,7 @@ end
 
 function trySetFxIndex(i)
 	willTry = function()
-		if #effectsChain > i then
+		if #effectsChain >= i then
 			fxIndex = i
 		else
 			print(string.format("invalid fxIndex: %s", fxIndex))
@@ -531,7 +533,7 @@ M.bindings  = {
   ['\\'] = (function() TidalClearEffects() end),
 
   ['<M-S-u>'] = (function() print("AHHHHHHHHHHHHHHHHHHHH") end),
-  ['<M-S-r>'] = tidalSolo.TidalResetCycles,
+  ['<M-r>'] = tidalSolo.TidalResetCycles,
 
   ['<M-_>'] = shiftFxValueOffset(-12),
   ['<M-+>'] = shiftFxValueOffset(12),
@@ -551,13 +553,25 @@ M.bindings  = {
 
   ['<M-->'] = (function () 
 	  if #effectsChain > 0 then
-		effectsChain[fxIndex][2] = math.floor(effectsChain[fxIndex][2] / 2)
+		if effectsChain[fxIndex][2] < 0 then
+			effectsChain[fxIndex][2] = effectsChain[fxIndex][2] * 2
+		elseif effectsChain[fxIndex][2] == 0 then
+			effectsChain[fxIndex][2] = -1
+		else
+			effectsChain[fxIndex][2] = math.floor(effectsChain[fxIndex][2] / 2)
+		end
 		SendFx()
 	  end
   end),
   ['<M-=>'] = (function () 
 	  if #effectsChain > 0 then
-		effectsChain[fxIndex][2] = effectsChain[fxIndex][2] * 2
+		if effectsChain[fxIndex][2] > 0 then
+			effectsChain[fxIndex][2] = effectsChain[fxIndex][2] * 2
+		elseif effectsChain[fxIndex][2] == 0 then
+			effectsChain[fxIndex][2] = 1
+		else
+			effectsChain[fxIndex][2] = math.ceil(effectsChain[fxIndex][2] / 2)
+		end
 		SendFx()
 	  end
   end),

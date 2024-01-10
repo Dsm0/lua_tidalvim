@@ -13,6 +13,13 @@ local M = {}
 -- use 
 -- :lua print(string.byte(vim.fn.getchar(),1,-1))
 -- to find the bytes for any valid key combo
+--
+--
+--
+--
+-- this is fucking ridiculous, having to define your own table,
+-- -- and having to update it each time you encounter a new binding, the system is fucking obvious
+-- -- 
 M.specialChars = {
   ['\x80kb'] = "<BS>",
   ['\128\107\68'] = "<Del>",
@@ -64,7 +71,8 @@ M.specialChars = {
   ['\128\252\10\61'] = "<M-+>",
   ['\128\252\10\128\107\98'] = "<M-S-BS>",
 
-  ['\128\252\8\82'] = "<M-S-r>",
+  ['\128\252\8\82'] = "<M-R>",
+  ['\128\252\8\114'] = "<M-r>",
 
   ['\51\50'] = '<Space>',
   ['\51\50'] = '<Space>',
