@@ -115,6 +115,7 @@ vim.keymap.set({"i"}, "<M-0>", " 0", { silent = true })
 vim.keymap.set({"i"}, "<M-->", " 11", { silent = true })
 vim.keymap.set({"i"}, "<M-=>", " 12", { silent = true })
 
+
 -- courtesy 
 -- https://www.reddit.com/r/neovim/comments/psux8f/comment/hdsfi9s/
 vim.keymap.set({"i"}, "<M-S-R>", function()

@@ -591,6 +591,11 @@ M.bindings  = {
 
   ['<Up>'] = (function () prevFx() end),
 
+  ['<Left>'] = TidalFxIndexLeft,
+  ['<M-Left>'] = TidalFxIndexStart,
+  ['<Right>'] = TidalFxIndexRight,
+  ['<M-Right>'] = TidalFxIndexEnd,
+
   [esc] = "quit",
 
 }
